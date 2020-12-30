@@ -1,0 +1,32 @@
+bate-papo 30 min com o cliente
+dsenvolvimento de propostas de prova de conceito
+apresentação das possíveis provas de conceito
+definição da prova de conceito
+desenho da prova de conceito
+
+Iniciação da prova cde conceito
+desenho básico da solução de repositório
+code commit - criação code commit para cada repositório
+code build, code deploy
+code pipeline
+
+replicação lambddas com deploy autm[atico
+criação das mensgens de cada lamndra 
+publicar e consumir mensagem das lambdas
+interligar as lâmbidas
+montar o banco de dados
+lambda com gatilho de tempo (webjob)
+olha no banco e manda o link
+armazenar mensagens de evno (iten concluído: uma tabela só, só gravar os status e data. )
+concluír saga (ter uma tabela de produtos a vencer/vencidos/finalizados). Só flegar o campo de descartado. após fim saga
+preparar documento do tcc
+esenhar logução
+esenhar implantação
+intergrar ao documento os desenhos
+falar se der tempo do cisc cobol
+preparar ppt para apresentação
+
+
+
+
+
