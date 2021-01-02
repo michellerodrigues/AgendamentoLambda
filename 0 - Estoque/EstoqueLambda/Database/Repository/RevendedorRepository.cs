@@ -1,16 +1,15 @@
+using EstoqueLambda.Database.DataContext;
+using EstoqueLambda.Database.Interfaces;
+using EstoqueLambda.Database.Repository;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using EstoqueService.DataContext;
-using EstoqueService.Data.Interfaces;
-using EstoqueService.Data.Models;
-using EstoqueService.Data.Repository;
-using Microsoft.EntityFrameworkCore;
+using EstoqueLambda.Database.Models;
 
 public class RevendedorRepository : Repository<Revendedor>, IRevendedorRepository
 {
-    private new AppDataContext _context;
-    public RevendedorRepository(AppDataContext context) : base(context)
+    private new DescarteDataContext _context;
+    public RevendedorRepository(DescarteDataContext context) : base(context)
     {
         _context = context;
     }

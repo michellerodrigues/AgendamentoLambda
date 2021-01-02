@@ -1,10 +1,7 @@
-using System;
+using EstoqueLambda.Database.Models;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using EstoqueService.Data.Models;
 
-namespace EstoqueService.Data.Interfaces
+namespace EstoqueLambda.Database.Interfaces
 {
     public interface IEstoqueRepository : IRepository<Estoque>
     {

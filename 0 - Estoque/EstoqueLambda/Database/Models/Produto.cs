@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using EstoqueService.Data.JoinFacade;
 
-namespace EstoqueService.Data.Models
+namespace EstoqueLambda.Database.Models
 {
     public class Produto
     {
@@ -25,7 +23,10 @@ namespace EstoqueService.Data.Models
         public decimal PesoVazio { get; set; }
 
         [Required]
-        public decimal VolumeEmbalagem { get; set; } 
+        public decimal VolumeEmbalagem { get; set; }
+
+        [Required]
+        public DateTime DataVencimento { get; set; }
 
         public virtual ICollection<Estoque> Estoques { get; } = new List<Estoque>();
 

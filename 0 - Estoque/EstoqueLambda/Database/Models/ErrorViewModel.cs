@@ -1,6 +1,6 @@
 using System;
 
-namespace EstoqueService.Models
+namespace EstoqueLambda.Database.Models
 {
     public class ErrorViewModel
     {

@@ -1,8 +1,6 @@
-using System;
 using System.Collections.Generic;
-using System.Linq.Expressions;
 
-namespace EstoqueService.Data.Interfaces
+namespace EstoqueLambda.Database.Interfaces
 {
     public interface IRepository<T> where T : class
     {

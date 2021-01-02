@@ -1,20 +1,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using EstoqueService.DataContext;
-using EstoqueService.Data.Interfaces;
-using Microsoft.EntityFrameworkCore;
-using System.Linq.Expressions;
-using Microsoft.EntityFrameworkCore.Query;
-using EstoqueService.Services.Util;
+using EstoqueLambda.Database.Interfaces;
 
-namespace EstoqueService.Data.Repository
+namespace EstoqueLambda.Database.Repository
 {
     public class Repository<T> : IRepository<T> where T: class
     {
-        protected readonly AppDataContext _context;
+        protected readonly DataContext.DescarteDataContext _context;
 
-        public Repository(AppDataContext context)
+        public Repository(DataContext.DescarteDataContext context)
         {
             _context = context;
         }
@@ -59,7 +54,7 @@ namespace EstoqueService.Data.Repository
 
         public void Update(T entity)
         {
-            _context.Entry(entity).State = EntityState.Modified;
+            _context.Entry(entity).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
             Save();
         }
     }

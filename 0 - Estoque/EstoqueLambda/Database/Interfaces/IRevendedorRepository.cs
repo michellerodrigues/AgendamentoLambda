@@ -1,10 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using EstoqueService.Data.Models;
+using EstoqueLambda.Database.Models;
 
-namespace EstoqueService.Data.Interfaces
+namespace EstoqueLambda.Database.Interfaces
 {
     public interface IRevendedorRepository : IRepository<Revendedor>
     {

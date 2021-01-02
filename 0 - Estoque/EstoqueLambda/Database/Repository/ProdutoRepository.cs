@@ -1,22 +1,23 @@
+using EstoqueLambda.Database.Interfaces;
+using EstoqueLambda.Database.Models;
+using EstoqueLambda.Database.Repository;
+using EstoqueLambda.Database.DataContext;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using EstoqueService.DataContext;
-using EstoqueService.Data.Interfaces;
-using EstoqueService.Data.Models;
-using EstoqueService.Data.Repository;
-using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
-public class ProdutoRepository : Repository<Produto>, IProdutoRepository
+namespace EstoqueLambda.Database.Repository
 {
-    private new AppDataContext _context;
-    public ProdutoRepository(AppDataContext context) : base(context)
+    public class ProdutoRepository : Repository<Produto>, IProdutoRepository
     {
-        _context = context;
+        public ProdutoRepository(DescarteDataContext context) : base(context)
+        {
+        }
+        public IEnumerable<Produto> FindProdutosVencidos()
+        {
+            return _context.Produtos.Where(pd => pd.DataVencimento <= DateTime.Now);
+        }
     }
 
-    public IEnumerable<Produto> FindProdutos(Func<Produto, bool> predicate)
-    {
-        throw new NotImplementedException();
-    }
 }
