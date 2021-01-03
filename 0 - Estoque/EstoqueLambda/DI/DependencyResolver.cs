@@ -39,6 +39,7 @@ namespace EstoqueLambda
             });
 
             services.AddTransient<IProdutoRepository, ProdutoRepository>();
+            services.AddTransient<IEstoqueRepository, EstoqueRepository>();
             // Register other services
             RegisterServices?.Invoke(services);
         }

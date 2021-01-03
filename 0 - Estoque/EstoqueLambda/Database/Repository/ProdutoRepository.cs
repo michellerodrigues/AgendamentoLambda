@@ -14,9 +14,9 @@ namespace EstoqueLambda.Database.Repository
         public ProdutoRepository(DescarteDataContext context) : base(context)
         {
         }
-        public IEnumerable<Produto> FindProdutosVencidos()
+        public IEnumerable<Produto> FindProdutoByName(string name)
         {
-            return _context.Produtos.Where(pd => pd.DataVencimento <= DateTime.Now);
+            return _context.Produtos.Where(pd => pd.Nome == name);
         }
     }
 

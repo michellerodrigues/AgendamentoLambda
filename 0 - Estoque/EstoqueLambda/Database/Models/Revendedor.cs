@@ -7,7 +7,7 @@ namespace EstoqueLambda.Database.Models
     public class Revendedor
     {
         [Key]
-        public Guid Id { get; set; }
+        public Guid Id { get; set; } = Guid.NewGuid();
 
         [Required]
         [StringLength(255)]

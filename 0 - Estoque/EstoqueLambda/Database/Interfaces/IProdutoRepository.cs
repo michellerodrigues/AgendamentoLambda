@@ -6,6 +6,6 @@ namespace EstoqueLambda.Database.Interfaces
 {
     public interface IProdutoRepository
     {
-        IEnumerable<Produto> FindProdutosVencidos();
+        IEnumerable<Produto> FindProdutoByName(string name);
     }
 }

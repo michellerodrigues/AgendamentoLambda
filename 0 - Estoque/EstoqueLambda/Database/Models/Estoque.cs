@@ -6,21 +6,21 @@ namespace EstoqueLambda.Database.Models
     public class Estoque
     {
         [Key]
-        public Guid EstoqueId { get; set; }
+        public Guid EstoqueId { get; set; } = Guid.NewGuid();
 
         [Required]
         [StringLength(10)]
-        public string Lote { get; set; }
+        public string Lote { get; set; } = Guid.NewGuid().ToString();
 
         [Required]
         [StringLength(3)]
         public string Serie { get; set; }
 
         [Required]
-        public DateTime DataInclusao { get; set; }
+        public DateTime DataInclusao { get; set; } = DateTime.Now;
 
         [Required]
-        public DateTime DataVecimentoProduto { get; set; }
+        public DateTime DataVecimentoProduto { get; set; } = DateTime.Now.AddDays(10);
 
         [Required]
         public decimal QtdeDispUnidade { get; set; }
