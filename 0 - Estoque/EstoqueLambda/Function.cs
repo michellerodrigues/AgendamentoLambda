@@ -51,11 +51,12 @@ namespace EstoqueLambda
                     LoteVencidoParaDescartarCommand lote = new LoteVencidoParaDescartarCommand()
                     {
                         DateMsg = System.DateTime.Now,
-                        TypeMsg = "LoteVencidoParaDescartarCommand",
                         Email = estoque.Fabricante.Email,
                         IdMsr = Guid.NewGuid(),
                         Lote = estoque.EstoqueId
                     };
+                    lote.TypeMsg = lote.GetType().AssemblyQualifiedName;
+
                     lotes.Add(lote);
                 }
                 foreach (LoteVencidoParaDescartarCommand lote in lotes)

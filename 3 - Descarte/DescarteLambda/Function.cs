@@ -23,35 +23,35 @@ namespace DescarteLambda
         /// <param name="input"></param>
         /// <param name="context"></param>
         /// <returns></returns>
-        public string FunctionHandler(string input, ILambdaContext context)
+        public string FunctionHandler(int input, ILambdaContext context)
         {
-            BaseMessage baseMsg = JsonConvert.DeserializeObject<BaseMessage>(input);
+            string inputString= "{\"Email\": \"mica-fabricante2@mailinator.com\",\"Lote\": \"9bd89eeb-ee99-4f46-b461-93b9b495eeb9\",\"IdMsr\": \"41b02429-ad8b-4493-8656-31f0fbea51a3\",\"DateMsg\": \"2021-01-03T12:27:40.150953-03:00\", \"TypeMsg\": \"Descarte.Messages.Command.LoteVencidoParaDescartarCommand, Descarte.Messages, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null\"}";
+
+            LoteVencidoParaDescartarCommand objeto = new LoteVencidoParaDescartarCommand();
+            
+            BaseMessage baseMsg = JsonConvert.DeserializeObject<BaseMessage>(inputString);
+            
+            string tipoAssemblyQualifiedName = objeto.GetType().AssemblyQualifiedName;
+            
+            string mica = "Descarte.Messages.Command.LoteVencidoParaDescartarCommand, Descarte.Messages, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null";
             
             Type tipo = Type.GetType(baseMsg.TypeMsg);
-            
-            ConstructorInfo constructor = tipo.GetConstructor(Type.EmptyTypes);
-            
-            object msgObject = constructor.Invoke(new object[] { });
-                        
-            MethodInfo msgMethod = this.GetType().GetMethod("HandleSagaMessage");
-            
-            var instance = Activator.CreateInstance(tipo, false);
+            Type tipo2 = Type.GetType(mica);
 
-            instance = JsonConvert.DeserializeObject(input);
+            dynamic instance = Activator.CreateInstance(tipo, false);
 
-            object msgValue = msgMethod.Invoke(msgObject, new object[] { instance });
-
-            return (string) msgValue;
+            return HandleSagaMessage(instance);
         }
 
-        private string HandleSagaMessage(LoteVencidoParaDescartarCommand lote)
+        public static string HandleSagaMessage(LoteVencidoParaDescartarCommand lote)
         {
-            return "bind ok";
+            return "LoteVencidoParaDescartarCommand ok";
         }
 
-        //public virtual T Cast<T>(object entity) where T : class
-        //{
-        //    return entity as T;
-        //}
+        public static string HandleSagaMessage(AgendarRetiradaCommand lote)
+        {
+            return "AgendarRetiradaCommand ok";
+        }
+
     }
 }
