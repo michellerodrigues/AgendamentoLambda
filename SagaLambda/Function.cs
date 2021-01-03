@@ -1,14 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
 using Amazon.Lambda.Core;
-using Amazon.Lambda.SQSEvents;
 using Amazon.SimpleNotificationService;
 using Amazon.SimpleNotificationService.Model;
 using Descarte.Messages.Command;
 using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
@@ -36,8 +33,9 @@ namespace SagaLambda
         /// <param name="evnt"></param>
         /// <param name="context"></param>
         /// <returns></returns>
-        public async Task FunctionHandler(string input, ILambdaContext context)
+        public async Task FunctionHandler(int input, ILambdaContext context)
         {
+
             string topicArn = "arn:aws:sns:sa-east-1:428672449531:DescarteSagaTopic";
 
             VerificarLotesVencidosParaDescartarCommand message = new VerificarLotesVencidosParaDescartarCommand();
@@ -45,33 +43,29 @@ namespace SagaLambda
 
             Dictionary<string, MessageAttributeValue> attributos = new Dictionary<string, MessageAttributeValue>();
 
-            attributos.Add("typeMsg", new MessageAttributeValue() { StringValue = message.GetType().AssemblyQualifiedName });
+            MessageAttributeValue values = new MessageAttributeValue()
+            {
+                StringValue = message.GetType().AssemblyQualifiedName
+            };
+            attributos.Add("typeMsg", values);
 
-            PublicarNoTopico(topicArn, JsonConvert.SerializeObject(message), attributos);
+            await PublicarNoTopico(topicArn, JsonConvert.SerializeObject(message), attributos);
         }
 
-        private async Task ProcessMessageAsync(SQSEvent.SQSMessage message, ILambdaContext context)
+        public async Task PublicarNoTopico(string topicArn, string message, Dictionary<string, MessageAttributeValue> attributos)
         {
-            context.Logger.LogLine($"Processed message {message.Body}");
-
-            // TODO: Do interesting work based on the new message
-            await Task.CompletedTask;
-        }
-
-        public string PublicarNoTopico(string topicArn, string message, Dictionary<string, MessageAttributeValue> attributos)
-        {
-            var client = new AmazonSimpleNotificationServiceClient(region: Amazon.RegionEndpoint.EUSouth1);
+            var client = new AmazonSimpleNotificationServiceClient(region: Amazon.RegionEndpoint.SAEast1);
 
             var request = new PublishRequest
             {
                 Message = message,
                 TopicArn = topicArn,
-                MessageAttributes = attributos
+                TargetArn = topicArn,
+                MessageAttributes= attributos
             };
 
-            client.PublishAsync(request);
-
-            return "Mensagem Publicada com sucesso";
+            string teste = JsonConvert.SerializeObject(request);
+            await client.PublishAsync(request);               
         }
     }
 }

@@ -86,48 +86,48 @@ namespace EstoqueLambda
             return "Mensagem Publicada com sucesso";
         }
 
-        public string VerificarFile(string queue)
-        {
-            var client = new AmazonSimpleNotificationServiceClient(region: Amazon.RegionEndpoint.EUSouth1);
+        //public string VerificarFile(string queue)
+        //{
+        //    var client = new AmazonSimpleNotificationServiceClient(region: Amazon.RegionEndpoint.EUSouth1);
 
-            var request = new PublishRequest
-            {
-                Message = message,
-                TopicArn = topicArn
-            };
+        //    var request = new PublishRequest
+        //    {
+        //        Message = message,
+        //        TopicArn = topicArn
+        //    };
 
-            client.PublishAsync(request);
+        //    client.PublishAsync(request);
 
-            return "Mensagem Publicada com sucesso";
-        }
+        //    return "Mensagem Publicada com sucesso";
+        //}
 
-        public async Task FunctionHandler(SQSEvent evnt, ILambdaContext context)
-        {
-            foreach (var message in evnt.Records)
-            {
-                await ProcessMessageAsync(message, context);
-            }
-        }
+        //public async Task FunctionHandler(SQSEvent evnt, ILambdaContext context)
+        //{
+        //    foreach (var message in evnt.Records)
+        //    {
+        //        await ProcessMessageAsync(message, context);
+        //    }
+        //}
 
-        private async Task ProcessMessageAsync(SQSEvent.SQSMessage message, ILambdaContext context)
-        {
-            context.Logger.LogLine($"Processed message '{message.Body}'");
+        //private async Task ProcessMessageAsync(SQSEvent.SQSMessage message, ILambdaContext context)
+        //{
+        //    context.Logger.LogLine($"Processed message '{message.Body}'");
 
-            // TODO: Do interesting work based on the new message
+        //    // TODO: Do interesting work based on the new message
 
-            var client = new AmazonSQSClient();
-            string topic = "https://sqs.sa-east-1.amazonaws.com/428672449531/agendamento_events_sqs";
+        //    var client = new AmazonSQSClient();
+        //    string topic = "https://sqs.sa-east-1.amazonaws.com/428672449531/agendamento_events_sqs";
 
-            RetiradaAgendadaEvent evento = new RetiradaAgendadaEvent()
-            {
-                DateMsg = DateTime.Now,
-                ReceivedMessage = message.Body
-            };
+        //    RetiradaAgendadaEvent evento = new RetiradaAgendadaEvent()
+        //    {
+        //        DateMsg = DateTime.Now,
+        //        ReceivedMessage = message.Body
+        //    };
 
-            await client.SendMessageAsync(topic, JsonConvert.SerializeObject(evento)).ConfigureAwait(false);
+        //    await client.SendMessageAsync(topic, JsonConvert.SerializeObject(evento)).ConfigureAwait(false);
 
-            await Task.CompletedTask;
-        }
+        //    await Task.CompletedTask;
+        //}
 
 
     }
