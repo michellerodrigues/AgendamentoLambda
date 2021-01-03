@@ -26,17 +26,10 @@ namespace DescarteLambda
         public string FunctionHandler(int input, ILambdaContext context)
         {
             string inputString= "{\"Email\": \"mica-fabricante2@mailinator.com\",\"Lote\": \"9bd89eeb-ee99-4f46-b461-93b9b495eeb9\",\"IdMsr\": \"41b02429-ad8b-4493-8656-31f0fbea51a3\",\"DateMsg\": \"2021-01-03T12:27:40.150953-03:00\", \"TypeMsg\": \"Descarte.Messages.Command.LoteVencidoParaDescartarCommand, Descarte.Messages, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null\"}";
-
-            LoteVencidoParaDescartarCommand objeto = new LoteVencidoParaDescartarCommand();
             
-            BaseMessage baseMsg = JsonConvert.DeserializeObject<BaseMessage>(inputString);
-            
-            string tipoAssemblyQualifiedName = objeto.GetType().AssemblyQualifiedName;
-            
-            string mica = "Descarte.Messages.Command.LoteVencidoParaDescartarCommand, Descarte.Messages, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null";
+            BaseMessage baseMsg = JsonConvert.DeserializeObject<BaseMessage>(inputString);           
             
             Type tipo = Type.GetType(baseMsg.TypeMsg);
-            Type tipo2 = Type.GetType(mica);
 
             dynamic instance = Activator.CreateInstance(tipo, false);
 

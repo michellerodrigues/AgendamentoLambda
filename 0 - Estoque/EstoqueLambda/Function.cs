@@ -1,4 +1,7 @@
 using Amazon.Lambda.Core;
+using Amazon.Lambda.SQSEvents;
+using Amazon.SimpleNotificationService;
+using Amazon.SimpleNotificationService.Model;
 using Amazon.SQS;
 using Descarte.Messages.Command;
 using EstoqueLambda.Database.DataContext;
@@ -35,7 +38,7 @@ namespace EstoqueLambda
         /// <param name="input"></param>
         /// <param name="context"></param>
         /// <returns></returns>
-        public async Task<string> FunctionHandler(string input, ILambdaContext context)
+        public async Task<string> FunctionHandler(SQSEvent evnt, ILambdaContext context)
         {
             var lotesVencidos = (List<Estoque>)EstoqueRepository.FindItensVencidosEstoque();
             var lotes = new List<LoteVencidoParaDescartarCommand>();
@@ -67,5 +70,65 @@ namespace EstoqueLambda
             }
             return $"Não existem lotes vencidos para descarte";      
         }
+
+        public string PublicarNoTopico(string topicArn, string message)
+        {
+            var client = new AmazonSimpleNotificationServiceClient(region: Amazon.RegionEndpoint.EUSouth1);
+
+            var request = new PublishRequest
+            {
+                Message = message,
+                TopicArn = topicArn
+            };
+
+            client.PublishAsync(request);
+
+            return "Mensagem Publicada com sucesso";
+        }
+
+        public string VerificarFile(string queue)
+        {
+            var client = new AmazonSimpleNotificationServiceClient(region: Amazon.RegionEndpoint.EUSouth1);
+
+            var request = new PublishRequest
+            {
+                Message = message,
+                TopicArn = topicArn
+            };
+
+            client.PublishAsync(request);
+
+            return "Mensagem Publicada com sucesso";
+        }
+
+        public async Task FunctionHandler(SQSEvent evnt, ILambdaContext context)
+        {
+            foreach (var message in evnt.Records)
+            {
+                await ProcessMessageAsync(message, context);
+            }
+        }
+
+        private async Task ProcessMessageAsync(SQSEvent.SQSMessage message, ILambdaContext context)
+        {
+            context.Logger.LogLine($"Processed message '{message.Body}'");
+
+            // TODO: Do interesting work based on the new message
+
+            var client = new AmazonSQSClient();
+            string topic = "https://sqs.sa-east-1.amazonaws.com/428672449531/agendamento_events_sqs";
+
+            RetiradaAgendadaEvent evento = new RetiradaAgendadaEvent()
+            {
+                DateMsg = DateTime.Now,
+                ReceivedMessage = message.Body
+            };
+
+            await client.SendMessageAsync(topic, JsonConvert.SerializeObject(evento)).ConfigureAwait(false);
+
+            await Task.CompletedTask;
+        }
+
+
     }
 }
