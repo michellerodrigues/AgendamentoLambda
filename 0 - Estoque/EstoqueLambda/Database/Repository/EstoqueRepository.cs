@@ -15,6 +15,7 @@ namespace EstoqueLambda.Database.Repository
         public EstoqueRepository(DataContext.DescarteDataContext context) : base(context)
         {
             _context = context;
+            _context.Estoques.Include(_ => _.Produto).Include(e => e.Revendedor).Include(e => e.Fabricante);
         }
 
 
@@ -27,9 +28,10 @@ namespace EstoqueLambda.Database.Repository
 
         public IEnumerable<Estoque> FindItensVencidosEstoque()
         {
-            return _context.Estoques.Where(e => e.Descartado == false && e.DataVecimentoProduto.ToOADate() <= DateTime.Now.ToOADate() && e.QtdeDispUnidade > 0)
-                .Include(c => c.Fabricante).Include(e => e.Revendedor).Include(e => e.Produto)
-                .OrderBy(e => e.Fabricante).ToList();
+            DateTime dataVenc = DateTime.Now;
+            return (_context.Estoques.Where(e => e.Descartado == false && e.QtdeDispUnidade > 0 && e.DataVecimentoProduto<= dataVenc)
+                .Include(_ => _.Produto).Include(e => e.Revendedor).Include(e => e.Fabricante)).
+                OrderBy(e => e.Fabricante).ToList();           
         }
     }
 }

@@ -7,7 +7,7 @@ namespace EstoqueLambda.Database.Models
     public class Produto
     {
         [Key]
-        public Guid Id { get; set; } = Guid.NewGuid();
+        public Guid ProdutoId { get; set; } = Guid.NewGuid();
 
         [Required]
         [StringLength(255)]
@@ -25,7 +25,7 @@ namespace EstoqueLambda.Database.Models
         [Required]
         public decimal VolumeEmbalagem { get; set; }
 
-        public virtual ICollection<Estoque> Estoques { get; } = new List<Estoque>();
+        public ICollection<Estoque> Estoques { get; } = new List<Estoque>();
 
     }
 }

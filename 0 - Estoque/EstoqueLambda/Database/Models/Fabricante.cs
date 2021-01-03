@@ -7,7 +7,7 @@ namespace EstoqueLambda.Database.Models
     public class Fabricante
     {
         [Key]
-        public Guid Id { get; set; } = Guid.NewGuid();
+        public Guid FabricanteId { get; set; } = Guid.NewGuid();
 
         [Required]
         [StringLength(255)]

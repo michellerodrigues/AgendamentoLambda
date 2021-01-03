@@ -13,11 +13,11 @@ namespace EstoqueLambda.Database.DataContext
 
             if (context.Database.EnsureCreated())
             {
-                var Fabricante1 = new Fabricante(){Email = "mica-fabricante1@mailinator.com",Id = Guid.NewGuid(),Nome = "Mica Fabricante I"};
-                var Fabricante2 = new Fabricante() { Email = "mica-fabricante2@mailinator.com", Id = Guid.NewGuid(), Nome = "Mica Fabricante II" };
-                var Fabricante3 = new Fabricante() { Email = "mica-fabricante3@mailinator.com", Id = Guid.NewGuid(), Nome = "Mica Fabricante III" };
-                var Fabricante4 = new Fabricante() { Email = "mica-fabricante4@mailinator.com", Id = Guid.NewGuid(), Nome = "Mica Fabricante IV" };
-                var Fabricante5 = new Fabricante() { Email = "mica-fabricante5@mailinator.com", Id = Guid.NewGuid(), Nome = "Mica Fabricante V" };
+                var Fabricante1 = new Fabricante(){Email = "mica-fabricante1@mailinator.com",Nome = "Mica Fabricante I"};
+                var Fabricante2 = new Fabricante() { Email = "mica-fabricante2@mailinator.com", Nome = "Mica Fabricante II" };
+                var Fabricante3 = new Fabricante() { Email = "mica-fabricante3@mailinator.com",  Nome = "Mica Fabricante III" };
+                var Fabricante4 = new Fabricante() { Email = "mica-fabricante4@mailinator.com", Nome = "Mica Fabricante IV" };
+                var Fabricante5 = new Fabricante() { Email = "mica-fabricante5@mailinator.com", Nome = "Mica Fabricante V" };
 
                 var Revendedor1 = new Revendedor() { Email = "mica-revendedor1@mailinator.com", Nome = "Mica Revendedor I" };
                 var Revendedor2 = new Revendedor() { Email = "mica-revendedor2@mailinator.com", Nome = "Mica Revendedor II" };
@@ -48,12 +48,12 @@ namespace EstoqueLambda.Database.DataContext
                 var loteEstou12 = new Estoque() { DataVecimentoProduto = DateTime.Now.AddDays(-1), Descartado = false, Fabricante = Fabricante5, QtdeDispUnidade = 12, Revendedor = Revendedor1 };
 
 
-                var produto1 = new Produto { Nome = "Cupinicida 3MAX ", Valor = 5662, Id = Guid.NewGuid(), PesoCheio = 20, PesoVazio = 3, VolumeEmbalagem = 3L };
-                var produto2 = new Produto { Nome = "Herbicida 3MAX ", Valor = 5021, Id = Guid.NewGuid(), PesoCheio = 10, PesoVazio = 3, VolumeEmbalagem = 1L };
-                var produto3 = new Produto { Nome = "Pesticida 3MAX ", Valor = 9652, Id = Guid.NewGuid(), PesoCheio = 20, PesoVazio = 3, VolumeEmbalagem = 1L };
-                var produto4 = new Produto { Nome = "Protol 3MAX ", Valor = 321, Id = Guid.NewGuid(), PesoCheio = 20, PesoVazio = 3, VolumeEmbalagem = 5L };
-                var produto5 = new Produto { Nome = "Protol 4MAX ", Valor = 321, Id = Guid.NewGuid(), PesoCheio = 15, PesoVazio = 3, VolumeEmbalagem = 1L };
-                var produto6 = new Produto { Nome = "Protol 5MAX ", Valor = 321, Id = Guid.NewGuid(), PesoCheio = 5, PesoVazio = 3, VolumeEmbalagem = 2L };
+                var produto1 = new Produto { Nome = "Cupinicida 3MAX ", Valor = 5662,  PesoCheio = 20, PesoVazio = 3, VolumeEmbalagem = 3L };
+                var produto2 = new Produto { Nome = "Herbicida 3MAX ", Valor = 5021, PesoCheio = 10, PesoVazio = 3, VolumeEmbalagem = 1L };
+                var produto3 = new Produto { Nome = "Pesticida 3MAX ", Valor = 9652,  PesoCheio = 20, PesoVazio = 3, VolumeEmbalagem = 1L };
+                var produto4 = new Produto { Nome = "Protol 3MAX ", Valor = 321, PesoCheio = 20, PesoVazio = 3, VolumeEmbalagem = 5L };
+                var produto5 = new Produto { Nome = "Protol 4MAX ", Valor = 321, PesoCheio = 15, PesoVazio = 3, VolumeEmbalagem = 1L };
+                var produto6 = new Produto { Nome = "Protol 5MAX ", Valor = 321,PesoCheio = 5, PesoVazio = 3, VolumeEmbalagem = 2L };
 
                 produto1.Estoques.Add(loteEstou1);
                 produto1.Estoques.Add(loteEstou2);
@@ -86,7 +86,7 @@ namespace EstoqueLambda.Database.DataContext
                 context.Produtos.Add(produto6);
                 
                 context.SaveChanges();
-            }
+           }
         }
     }
 }

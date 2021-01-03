@@ -9,10 +9,6 @@ namespace EstoqueLambda.Database.Models
         public Guid EstoqueId { get; set; } = Guid.NewGuid();
 
         [Required]
-        [StringLength(10)]
-        public string Lote { get; set; } = Guid.NewGuid().ToString();
-
-        [Required]
         [StringLength(3)]
         public string Serie { get; set; }
 
@@ -29,7 +25,6 @@ namespace EstoqueLambda.Database.Models
         public bool Descartado { get; set; }
         
         public Guid FabricanteId { get; set; }
-
         public Fabricante Fabricante { get; set;}
 
         public Guid RevendedorId { get; set; }

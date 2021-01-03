@@ -1,16 +1,15 @@
 using Amazon.Lambda.Core;
-using EstoqueLambda.Database.Interfaces;
-using Microsoft.Extensions.DependencyInjection;
-using EstoqueLambda.DI;
-using EstoqueLambda.Database.DataContext;
 using Amazon.SQS;
-using Descarte.Messages.Event;
-using Newtonsoft.Json;
-using System.Threading.Tasks;
-using EstoqueLambda.Database.Models;
-using System.Collections.Generic;
 using Descarte.Messages.Command;
+using EstoqueLambda.Database.DataContext;
+using EstoqueLambda.Database.Interfaces;
+using EstoqueLambda.Database.Models;
+using EstoqueLambda.DI;
+using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.SystemTextJson.DefaultLambdaJsonSerializer))]
@@ -40,8 +39,10 @@ namespace EstoqueLambda
         {
             var lotesVencidos = (List<Estoque>)EstoqueRepository.FindItensVencidosEstoque();
             var lotes = new List<LoteVencidoParaDescartarCommand>();
+            //var snsClient = new AmazonSimpleNotificationServiceClient()
+            
             var client = new AmazonSQSClient();
-            string topic = "https://sqs.sa-east-1.amazonaws.com/428672449531/DescarteSagaTopic";
+            string queue = "https://sqs.sa-east-1.amazonaws.com/428672449531/lote-pendentes-queue";
 
             if (lotesVencidos != null)
             {              
@@ -50,20 +51,20 @@ namespace EstoqueLambda
                     LoteVencidoParaDescartarCommand lote = new LoteVencidoParaDescartarCommand()
                     {
                         DateMsg = System.DateTime.Now,
-                        TypeMsg = typeof(LoteVencidoParaDescartarCommand).ToString(),
+                        TypeMsg = "LoteVencidoParaDescartarCommand",
                         Email = estoque.Fabricante.Email,
                         IdMsr = Guid.NewGuid(),
-                        Lote = Guid.Parse(estoque.Lote)
+                        Lote = estoque.EstoqueId
                     };
                     lotes.Add(lote);
                 }
                 foreach (LoteVencidoParaDescartarCommand lote in lotes)
                 {
-                    await client.SendMessageAsync(topic, JsonConvert.SerializeObject(lote)).ConfigureAwait(false);
+                    await client.SendMessageAsync(queue, JsonConvert.SerializeObject(lote)).ConfigureAwait(false);
                 }
                 return $"Lotes enviados para a fila : {lotes.Count}";
             }
             return $"Não existem lotes vencidos para descarte";      
-        }              
+        }
     }
 }
