@@ -1,19 +1,20 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
 using Amazon.Lambda.Core;
+using Amazon.Lambda.SNSEvents;
 using Amazon.SimpleNotificationService;
 using Amazon.SimpleNotificationService.Model;
 using Descarte.Messages.Command;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
-using System.Threading.Tasks;
 
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.SystemTextJson.DefaultLambdaJsonSerializer))]
 
-namespace SagaLambda
+namespace SagaDescarteLambda
 {
     public class Function
     {
@@ -29,57 +30,47 @@ namespace SagaLambda
 
 
         /// <summary>
-        /// This method is called for every Lambda invocation. This method takes in an SQS event object and can be used 
-        /// to respond to SQS messages.
+        /// This method is called for every Lambda invocation. This method takes in an SNS event object and can be used 
+        /// to respond to SNS messages.
         /// </summary>
         /// <param name="evnt"></param>
         /// <param name="context"></param>
         /// <returns></returns>
-        public async Task<string> FunctionHandler(int input, ILambdaContext context)
+        public async Task FunctionHandler(int aa, ILambdaContext context)
         {
-            int numero = input;
-            string topicArn = "arn:aws:sns:sa-east-1:428672449531:DescarteSagaTopic";
+            //string topicArn = "arn:aws:sns:sa-east-1:428672449531:DescarteSagaTopic";
 
-      //      string topicArn = "arn:aws:sns:sa-east-1:428672449531:saga-topic";
+            string topicArn = "arn:aws:lambda:sa-east-1:428672449531:function:SagaLambda";
 
             VerificarLotesVencidosParaDescartarCommand message = new VerificarLotesVencidosParaDescartarCommand();
             message.TypeMsg = message.GetType().AssemblyQualifiedName;
 
             Dictionary<string, MessageAttributeValue> attributos = new Dictionary<string, MessageAttributeValue>();
 
-            Dictionary<string, string> values = new Dictionary<string, string>();
-
-            byte[] byteArray = Encoding.UTF8.GetBytes(message.GetType().AssemblyQualifiedName);
-
-            var stream = new MemoryStream(byteArray);
-            stream.Position = 0;
-
-                      MessageAttributeValue attrib = new MessageAttributeValue()
+            MessageAttributeValue values = new MessageAttributeValue()
             {
-                StringValue = message.GetType().AssemblyQualifiedName,
-                DataType = "String"
+                StringValue = message.GetType().AssemblyQualifiedName
             };
+            attributos.Add("typeMsg", values);
 
-            attributos.Add("typeMsg", attrib);
+            await ProcessRecordAsync(topicArn, JsonConvert.SerializeObject(message), attributos);
 
-            return await PublicarNoTopico(topicArn, JsonConvert.SerializeObject(message), attributos);
         }
 
-        public async Task<string> PublicarNoTopico(string topicArn, string message, Dictionary<string, MessageAttributeValue> attributos)
+        private async Task ProcessRecordAsync(string topicArn, string message, Dictionary<string, MessageAttributeValue> attributos)
         {
             var client = new AmazonSimpleNotificationServiceClient(region: Amazon.RegionEndpoint.SAEast1);
 
-            var request = new PublishRequest()
+            var request = new PublishRequest
             {
                 Message = message,
-                MessageAttributes= attributos,
-                TopicArn = topicArn
+                TopicArn = topicArn,
+                TargetArn = topicArn,
+                MessageAttributes = attributos
             };
 
             string teste = JsonConvert.SerializeObject(request);
-            await client.PublishAsync(request);
-
-            return $"mensagem publicada { teste}";
+            await client.PublishAsync(request);         
         }
     }
 }
