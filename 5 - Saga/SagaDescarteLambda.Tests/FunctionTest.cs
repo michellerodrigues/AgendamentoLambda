@@ -37,7 +37,7 @@ namespace SagaDescarteLambda.Tests
             };
 
             var function = new Function();
-            await function.FunctionHandler(snsEvent, context);
+           // await function.FunctionHandler(snsEvent, context);
 
             Assert.Contains("Processed record foobar", logger.Buffer.ToString());
         }

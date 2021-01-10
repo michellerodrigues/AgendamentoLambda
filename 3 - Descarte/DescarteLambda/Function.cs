@@ -36,10 +36,10 @@ namespace DescarteLambda
             return HandleSagaMessage(instance);
         }
 
-        public static string HandleSagaMessage(LoteVencidoParaDescartarCommand lote)
-        {
-            return "LoteVencidoParaDescartarCommand ok";
-        }
+        //public static string HandleSagaMessage(LoteVencidoParaDescartarCommand lote)
+        //{
+        //    return "LoteVencidoParaDescartarCommand ok";
+        //}
 
         public static string HandleSagaMessage(AgendarRetiradaCommand lote)
         {

@@ -42,7 +42,7 @@ namespace SagaDescarteLambda
 
             string topicArn = "arn:aws:lambda:sa-east-1:428672449531:function:SagaLambda";
 
-            VerificarLotesVencidosParaDescartarCommand message = new VerificarLotesVencidosParaDescartarCommand();
+            VerificarLotesVencidosCommand message = new VerificarLotesVencidosCommand();
             message.TypeMsg = message.GetType().AssemblyQualifiedName;
 
             Dictionary<string, MessageAttributeValue> attributos = new Dictionary<string, MessageAttributeValue>();

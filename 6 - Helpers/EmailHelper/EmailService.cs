@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Net.Mail;
+using System.Threading.Tasks;
 
 namespace EmailHelper
 {
@@ -17,7 +18,7 @@ namespace EmailHelper
             {
                 UseDefaultCredentials = false,
                 Credentials = new NetworkCredential(emailConfigOptions.Credentials.Username, emailConfigOptions.Credentials.Password),
-                EnableSsl = true
+                EnableSsl = true                
             };
 
             _mailAddress = new MailAddress(emailConfigOptions.Credentials.Username);
@@ -25,7 +26,7 @@ namespace EmailHelper
 
         }
 
-        public bool Enviar(string remetente, string assunto, string mensagem)
+        public async Task<bool> Enviar(string remetente, string assunto, string mensagem)
         {
             try
             {
@@ -38,7 +39,7 @@ namespace EmailHelper
                 mail.Body = mensagem;
 
                 mail.IsBodyHtml = true;
-                _smtpClient.Send(mail);
+                await _smtpClient.SendMailAsync(mail).ConfigureAwait(false);
 
                 return true;
 

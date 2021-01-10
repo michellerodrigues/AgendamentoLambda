@@ -1,10 +1,11 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using EmailHelper;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
 
 
-namespace EmailHelper.DI
+namespace Microsoft.Extensions.DependencyInjection
 {
     public static class EmailHelperExtensions
     {
@@ -12,12 +13,12 @@ namespace EmailHelper.DI
 
         public static void AddEmailService(IServiceCollection services, IConfiguration Configuration)
         {
+            var config = new EmailConfigOptions();
+            Configuration.Bind(EmailConfigOptions.EmailConfig, config);
 
-            services.AddOptions<EmailConfigOptions>()
-                .Bind(Configuration.GetSection(EmailConfigOptions.EmailConfig))
-           .ValidateDataAnnotations();
+            services.AddSingleton<EmailConfigOptions>(config);
 
-            services.AddScoped<IEmailService, EmailService>();
+            services.AddTransient<IEmailService, EmailService>();
         }
     }
 }

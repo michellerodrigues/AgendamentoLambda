@@ -6,6 +6,10 @@ using System;
 using EstoqueLambda.Database.Repository;
 using EstoqueLambda.Database.Interfaces;
 using EmailHelper;
+using Microsoft.Extensions.Configuration;
+using System.IO;
+using System.Configuration;
+using Newtonsoft.Json;
 
 namespace EstoqueLambda
 {
@@ -20,34 +24,53 @@ namespace EstoqueLambda
             // Set up Dependency Injection
             var serviceCollection = new ServiceCollection();
             RegisterServices = registerServices;
+
             ConfigureServices(serviceCollection);
+
             ServiceProvider = serviceCollection.BuildServiceProvider();
+                     
+
         }
 
         private void ConfigureServices(IServiceCollection services)
         {
-            var appSettings = ServiceProvider.GetService<IConfigurationService>().GetConfiguration();
-            var connectionString = appSettings.DescarteDataContext;
+            //building configuration
+            var configuration = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .AddEnvironmentVariables()
+                .Build();
 
-            services.AddScoped<IEmailService, EmailService>();
-            
-                // Register env and config services
+            //Get strongly typed setting from appsettings binding to object graph
+            var appSettings = configuration.Get<AppSettings>();
+            // adding to service collection so that it can be resolved/injected as needed.
+            services.AddSingleton(appSettings);
+
+            ConfigureEmailService(services, configuration);
+
             services.AddTransient<IEnvironmentService, EnvironmentService>();
-            services.AddTransient<IConfigurationService, ConfigurationService>();
-            // Register DbContext class
-            services.AddTransient(provider =>
-            {               
-                var optionsBuilder = new DbContextOptionsBuilder<DescarteDataContext>();
-                optionsBuilder.UseMySql(connectionString, builder => builder.MigrationsAssembly("NetCoreLambda.EF.Design"));
-                return new DescarteDataContext(optionsBuilder.Options);
-            });
-
-
-
+           // services.AddTransient<IConfigurationService, ConfigurationService>();
             services.AddTransient<IProdutoRepository, ProdutoRepository>();
             services.AddTransient<IEstoqueRepository, EstoqueRepository>();
+
+           // services.AddTransient<IEmailService, EmailService>();
+    
+            // Register DbContext class
+            services.AddTransient(provider =>
+            {                     
+                var optionsBuilder = new DbContextOptionsBuilder<DescarteDataContext>();
+                optionsBuilder.UseMySql(appSettings.DescarteDataContext, builder => builder.MigrationsAssembly("NetCoreLambda.EF.Design"));
+                return new DescarteDataContext(optionsBuilder.Options);
+            });                      
+            
             // Register other services
             RegisterServices?.Invoke(services);
         }
+
+        private void ConfigureEmailService(IServiceCollection services, IConfiguration configuration)
+        {
+            EmailHelperExtensions.AddEmailService(services, configuration);           
+        }
+
     }
 }

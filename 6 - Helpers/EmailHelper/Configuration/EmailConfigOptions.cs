@@ -1,7 +1,7 @@
 ﻿
     public class EmailConfigOptions
     {
-        public const string EmailConfig = "AppSettings:EmailConfig";
+        public const string EmailConfig = "EmailConfig";
         public EmailOptions Credentials { get; set; }
         public ServerOptions Server { get; set; }
     }

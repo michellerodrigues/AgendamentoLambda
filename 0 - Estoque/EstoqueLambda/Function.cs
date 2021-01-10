@@ -5,6 +5,7 @@ using Amazon.SimpleNotificationService.Model;
 using Amazon.SQS;
 using Descarte.Messages;
 using Descarte.Messages.Command;
+using EmailHelper;
 using EstoqueLambda.Database.DataContext;
 using EstoqueLambda.Database.Interfaces;
 using EstoqueLambda.Database.Models;
@@ -22,34 +23,48 @@ namespace EstoqueLambda
 {
     public class Function
     {
-        public Microsoft.Extensions.Configuration.IConfiguration ConfigService { get; }
-        public IEstoqueRepository EstoqueRepository { get; }
-        
+        public AppSettings AppSettings { get; }
+        private readonly IEstoqueRepository _estoqueRepository;
+
+        private readonly IEmailService _emailService;
+
+
         public Function()
         {
             var resolver = new DependencyResolver();
-            EstoqueRepository = resolver.ServiceProvider.GetService<IEstoqueRepository>();
-            ConfigService = resolver.ServiceProvider.GetService<IConfigurationService>().GetConfiguration();
+            _estoqueRepository = resolver.ServiceProvider.GetService<IEstoqueRepository>();
+            _emailService = resolver.ServiceProvider.GetService<IEmailService>();
+            
             var initializeDbContext = new InitializeDbContext();
         }
-        
-        /// <summary>
-        /// A simple function that takes a string and does a ToUpper
-        /// </summary>
-        /// <param name="input"></param>
-        /// <param name="context"></param>
-        /// <returns></returns>
-        public async Task FunctionHandler(SQSEvent.SQSMessage message, ILambdaContext context)
+
+        ///// <summary>
+        ///// A simple function that takes a string and does a ToUpper
+        ///// </summary>
+        ///// <param name="input"></param>
+        ///// <param name="context"></param>
+        ///// <returns></returns>
+        ////public async Task FunctionHandler(SQSEvent.SQSMessage message, ILambdaContext context)
+        //public async Task FunctionHandler(int i, ILambdaContext context)
+        //{
+        //    BaseMessage baseMsg = JsonConvert.DeserializeObject<BaseMessage>(message.Body);
+        //    Type tipo = Type.GetType(baseMsg.TypeMsg);
+        //    dynamic instance = Activator.CreateInstance(tipo, false);
+        //   HandleSagaMessage(instance);  
+        //}
+
+        //public async Task FunctionHandler(SQSEvent.SQSMessage message, ILambdaContext context)
+        public async Task FunctionHandler(int i, ILambdaContext context)
         {
-            BaseMessage baseMsg = JsonConvert.DeserializeObject<BaseMessage>(message.Body);
-            Type tipo = Type.GetType(baseMsg.TypeMsg);
-            dynamic instance = Activator.CreateInstance(tipo, false);
-            HandleSagaMessage(instance);  
+            _emailService.Enviar("mica.msr@gmail.com", "teste envio lambda", "oi, esta é uma mensagem com acento e quebra de linha \n");
+            
+            await Task.CompletedTask;
+
         }
 
         public async Task<string> HandleSagaMessage(VerificarLotesVencidosCommand msg)
         {
-            var lotesVencidos = (List<Estoque>)EstoqueRepository.FindItensVencidosEstoque();
+            var lotesVencidos = (List<Estoque>)_estoqueRepository.FindItensVencidosEstoque();
             var lotes = new List<LotesVencidosVerificadosEvent>();
 
             var client = new AmazonSQSClient();
@@ -81,7 +96,7 @@ namespace EstoqueLambda
 
         public async Task<string> HandleSagaMessage(LotesVencidosVerificadosEvent msg)
         {
-            var lotesVencidos = (List<Estoque>)EstoqueRepository.AtualizarLotesEnviadosParaDescarte(msg.Lote);
+            var lotesVencidos = (List<Estoque>)_estoqueRepository.AtualizarLotesEnviadosParaDescarte(msg.Lote);
 
             var client = new AmazonSQSClient();
             string queue = "https://sqs.sa-east-1.amazonaws.com/428672449531/agendamento";
