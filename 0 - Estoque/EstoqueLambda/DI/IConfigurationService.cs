@@ -4,6 +4,6 @@ namespace EstoqueLambda.DI
 {
     public interface IConfigurationService
     {
-        IConfiguration GetConfiguration();
+        AppSettings GetConfiguration();
     }
 }

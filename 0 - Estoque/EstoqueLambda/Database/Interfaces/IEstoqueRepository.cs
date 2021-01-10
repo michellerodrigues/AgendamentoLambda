@@ -1,4 +1,5 @@
 using EstoqueLambda.Database.Models;
+using System;
 using System.Collections.Generic;
 
 namespace EstoqueLambda.Database.Interfaces
@@ -8,6 +9,8 @@ namespace EstoqueLambda.Database.Interfaces
         IEnumerable<Estoque> FindItensVencidosEstoque();
 
         IEnumerable<Estoque> FindItensFinalizadosEstoque();
+
+        IEnumerable<Estoque> AtualizarLotesEnviadosParaDescarte(Guid estoqueId);
     }
 
 }

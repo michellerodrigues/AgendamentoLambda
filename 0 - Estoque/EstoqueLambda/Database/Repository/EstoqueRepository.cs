@@ -33,5 +33,12 @@ namespace EstoqueLambda.Database.Repository
                 .Include(_ => _.Produto).Include(e => e.Revendedor).Include(e => e.Fabricante)).
                 OrderBy(e => e.Fabricante).ToList();           
         }
+
+        public IEnumerable<Estoque> AtualizarLotesEnviadosParaDescarte(Guid estoqueId)
+        {
+            DateTime dataVenc = DateTime.Now;
+            return _context.Estoques.Where(e => e.Descartado == false && e.EstoqueId == estoqueId);
+        }
+
     }
 }

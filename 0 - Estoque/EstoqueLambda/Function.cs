@@ -3,6 +3,7 @@ using Amazon.Lambda.SQSEvents;
 using Amazon.SimpleNotificationService;
 using Amazon.SimpleNotificationService.Model;
 using Amazon.SQS;
+using Descarte.Messages;
 using Descarte.Messages.Command;
 using EstoqueLambda.Database.DataContext;
 using EstoqueLambda.Database.Interfaces;
@@ -38,20 +39,27 @@ namespace EstoqueLambda
         /// <param name="input"></param>
         /// <param name="context"></param>
         /// <returns></returns>
-        public async Task<string> FunctionHandler(SQSEvent evnt, ILambdaContext context)
+        public async Task FunctionHandler(SQSEvent.SQSMessage message, ILambdaContext context)
+        {
+            BaseMessage baseMsg = JsonConvert.DeserializeObject<BaseMessage>(message.Body);
+            Type tipo = Type.GetType(baseMsg.TypeMsg);
+            dynamic instance = Activator.CreateInstance(tipo, false);
+            HandleSagaMessage(instance);  
+        }
+
+        public async Task<string> HandleSagaMessage(VerificarLotesVencidosCommand msg)
         {
             var lotesVencidos = (List<Estoque>)EstoqueRepository.FindItensVencidosEstoque();
-            var lotes = new List<LoteVencidoParaDescartarCommand>();
-            //var snsClient = new AmazonSimpleNotificationServiceClient()
-            
+            var lotes = new List<LotesVencidosVerificadosEvent>();
+
             var client = new AmazonSQSClient();
-            string queue = "https://sqs.sa-east-1.amazonaws.com/428672449531/lote-pendentes-queue";
+            string queue = "https://sqs.sa-east-1.amazonaws.com/428672449531/agendamento";
 
             if (lotesVencidos != null)
-            {              
+            {
                 foreach (Estoque estoque in lotesVencidos)
                 {
-                    LoteVencidoParaDescartarCommand lote = new LoteVencidoParaDescartarCommand()
+                    LotesVencidosVerificadosEvent lote = new LotesVencidosVerificadosEvent()
                     {
                         DateMsg = System.DateTime.Now,
                         Email = estoque.Fabricante.Email,
@@ -62,72 +70,28 @@ namespace EstoqueLambda
 
                     lotes.Add(lote);
                 }
-                foreach (LoteVencidoParaDescartarCommand lote in lotes)
+                foreach (LotesVencidosVerificadosEvent lote in lotes)
                 {
                     await client.SendMessageAsync(queue, JsonConvert.SerializeObject(lote)).ConfigureAwait(false);
                 }
                 return $"Lotes enviados para a fila : {lotes.Count}";
             }
-            return $"Não existem lotes vencidos para descarte";      
+            return $"Não existem lotes vencidos para descarte";
         }
 
-        public string PublicarNoTopico(string topicArn, string message)
+        public async Task<string> HandleSagaMessage(LotesVencidosVerificadosEvent msg)
         {
-            var client = new AmazonSimpleNotificationServiceClient(region: Amazon.RegionEndpoint.EUSouth1);
+            var lotesVencidos = (List<Estoque>)EstoqueRepository.AtualizarLotesEnviadosParaDescarte(msg.Lote);
 
-            var request = new PublishRequest
+            var client = new AmazonSQSClient();
+            string queue = "https://sqs.sa-east-1.amazonaws.com/428672449531/agendamento";
+
+            if (lotesVencidos != null)
             {
-                Message = message,
-                TopicArn = topicArn
-            };
-
-            client.PublishAsync(request);
-
-            return "Mensagem Publicada com sucesso";
+                return $"Lotes Descartados Com Sucesso";
+            }
+            return $"Não existem lotes vencidos para descarte";
         }
-
-        //public string VerificarFile(string queue)
-        //{
-        //    var client = new AmazonSimpleNotificationServiceClient(region: Amazon.RegionEndpoint.EUSouth1);
-
-        //    var request = new PublishRequest
-        //    {
-        //        Message = message,
-        //        TopicArn = topicArn
-        //    };
-
-        //    client.PublishAsync(request);
-
-        //    return "Mensagem Publicada com sucesso";
-        //}
-
-        //public async Task FunctionHandler(SQSEvent evnt, ILambdaContext context)
-        //{
-        //    foreach (var message in evnt.Records)
-        //    {
-        //        await ProcessMessageAsync(message, context);
-        //    }
-        //}
-
-        //private async Task ProcessMessageAsync(SQSEvent.SQSMessage message, ILambdaContext context)
-        //{
-        //    context.Logger.LogLine($"Processed message '{message.Body}'");
-
-        //    // TODO: Do interesting work based on the new message
-
-        //    var client = new AmazonSQSClient();
-        //    string topic = "https://sqs.sa-east-1.amazonaws.com/428672449531/agendamento_events_sqs";
-
-        //    RetiradaAgendadaEvent evento = new RetiradaAgendadaEvent()
-        //    {
-        //        DateMsg = DateTime.Now,
-        //        ReceivedMessage = message.Body
-        //    };
-
-        //    await client.SendMessageAsync(topic, JsonConvert.SerializeObject(evento)).ConfigureAwait(false);
-
-        //    await Task.CompletedTask;
-        //}
 
 
     }

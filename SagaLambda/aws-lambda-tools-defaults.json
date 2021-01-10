@@ -16,8 +16,9 @@
     "function-handler"     : "SagaLambda::SagaLambda.Function::FunctionHandler",
     "function-name"        : "SagaLambda",
     "package-type"         : "Zip",
-    "function-role"        : "arn:aws:iam::428672449531:role/service-role/FunctionMicaHandler-role-x153qswt",
+    "function-role"        : "arn:aws:iam::428672449531:role/full_access_lambda",
     "tracing-mode"         : "PassThrough",
     "environment-variables" : "",
-    "image-tag"             : ""
+    "image-tag"             : "",
+    "function-description"  : "full acess"
 }

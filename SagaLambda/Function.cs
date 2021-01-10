@@ -37,24 +37,19 @@ namespace SagaLambda
         /// <returns></returns>
         public async Task<string> FunctionHandler(int input, ILambdaContext context)
         {
-            int numero = input;
             string topicArn = "arn:aws:sns:sa-east-1:428672449531:DescarteSagaTopic";
 
-      //      string topicArn = "arn:aws:sns:sa-east-1:428672449531:saga-topic";
-
-            VerificarLotesVencidosParaDescartarCommand message = new VerificarLotesVencidosParaDescartarCommand();
+            VerificarLotesVencidosCommand message = new VerificarLotesVencidosCommand();
             message.TypeMsg = message.GetType().AssemblyQualifiedName;
 
             Dictionary<string, MessageAttributeValue> attributos = new Dictionary<string, MessageAttributeValue>();
-
-            Dictionary<string, string> values = new Dictionary<string, string>();
 
             byte[] byteArray = Encoding.UTF8.GetBytes(message.GetType().AssemblyQualifiedName);
 
             var stream = new MemoryStream(byteArray);
             stream.Position = 0;
 
-                      MessageAttributeValue attrib = new MessageAttributeValue()
+            MessageAttributeValue attrib = new MessageAttributeValue()
             {
                 StringValue = message.GetType().AssemblyQualifiedName,
                 DataType = "String"

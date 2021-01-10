@@ -5,6 +5,7 @@ VisualStudioVersion = 16.0.29806.167
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{277FC37F-9B49-4D1E-9333-9560163D8C52}"
 	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
 		0 - Estoque\roteiro poc tcc puc minas.txt = 0 - Estoque\roteiro poc tcc puc minas.txt
 	EndProjectSection
 EndProject
@@ -45,6 +46,10 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SagaDescarteLambda", "5 - Saga\SagaDescarteLambda\SagaDescarteLambda.csproj", "{5691D850-D1D2-40F5-A0A3-1D172F3E55F8}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SagaDescarteLambda.Tests", "5 - Saga\SagaDescarteLambda.Tests\SagaDescarteLambda.Tests.csproj", "{961AFAD8-7D7C-40C7-BCE0-D269CA86C29B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "6 - Helpers", "6 - Helpers", "{A0B4A7B1-4F02-464D-BBB5-261649F2D68B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmailHelper", "6 - Helpers\EmailHelper\EmailHelper.csproj", "{B35C497A-2989-447B-8B02-E8AF79E06FD5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -104,6 +109,10 @@ Global
 		{961AFAD8-7D7C-40C7-BCE0-D269CA86C29B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{961AFAD8-7D7C-40C7-BCE0-D269CA86C29B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{961AFAD8-7D7C-40C7-BCE0-D269CA86C29B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B35C497A-2989-447B-8B02-E8AF79E06FD5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B35C497A-2989-447B-8B02-E8AF79E06FD5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B35C497A-2989-447B-8B02-E8AF79E06FD5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B35C497A-2989-447B-8B02-E8AF79E06FD5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -122,6 +131,7 @@ Global
 		{DF3415CA-4DA7-475D-8241-6745B8C7DB57} = {2DE60226-1894-4A41-AD4C-82D48E11A371}
 		{5691D850-D1D2-40F5-A0A3-1D172F3E55F8} = {2DE60226-1894-4A41-AD4C-82D48E11A371}
 		{961AFAD8-7D7C-40C7-BCE0-D269CA86C29B} = {2DE60226-1894-4A41-AD4C-82D48E11A371}
+		{B35C497A-2989-447B-8B02-E8AF79E06FD5} = {A0B4A7B1-4F02-464D-BBB5-261649F2D68B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C54D2F21-028B-4827-BF22-84033316877A}

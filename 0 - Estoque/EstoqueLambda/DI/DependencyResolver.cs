@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using EstoqueLambda.Database.Repository;
 using EstoqueLambda.Database.Interfaces;
+using EmailHelper;
 
 namespace EstoqueLambda
 {
@@ -25,18 +26,23 @@ namespace EstoqueLambda
 
         private void ConfigureServices(IServiceCollection services)
         {
-            // Register env and config services
+            var appSettings = ServiceProvider.GetService<IConfigurationService>().GetConfiguration();
+            var connectionString = appSettings.DescarteDataContext;
+
+            services.AddScoped<IEmailService, EmailService>();
+            
+                // Register env and config services
             services.AddTransient<IEnvironmentService, EnvironmentService>();
             services.AddTransient<IConfigurationService, ConfigurationService>();
             // Register DbContext class
             services.AddTransient(provider =>
-            {
-                var configService = provider.GetService<IConfigurationService>();
-                var connectionString = configService.GetConfiguration().GetSection(nameof(DescarteDataContext)).Value;
+            {               
                 var optionsBuilder = new DbContextOptionsBuilder<DescarteDataContext>();
                 optionsBuilder.UseMySql(connectionString, builder => builder.MigrationsAssembly("NetCoreLambda.EF.Design"));
                 return new DescarteDataContext(optionsBuilder.Options);
             });
+
+
 
             services.AddTransient<IProdutoRepository, ProdutoRepository>();
             services.AddTransient<IEstoqueRepository, EstoqueRepository>();
