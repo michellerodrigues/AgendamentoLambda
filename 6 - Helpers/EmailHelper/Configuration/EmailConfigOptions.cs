@@ -1,14 +1,9 @@
 ﻿
-    public class EmailConfigOptions//: IEmailConfigOptions
+    public class EmailConfigOptions
     {
         public const string EmailConfig = "EmailConfig";
         public EmailOptions Credentials { get; set; }
         public ServerOptions Server { get; set; }
-
-        //public EmailConfigOptions GetEmailConfigOptions()
-        //{
-        //    return new EmailConfigOptions();
-        //}
     }
 
     public class EmailOptions

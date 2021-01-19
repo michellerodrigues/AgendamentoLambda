@@ -37,7 +37,7 @@ namespace Saga.Dependency.DI
 
             var appSettings = configuration.Get<AppSettings>();
             services.AddSingleton(appSettings);
-            ConfigureDescarteDataContext(services);
+            ConfigureDescarteDataContext(appSettings);
             AddEmailService(services, configuration);
             services.AddTransient<IEnvironmentService, EnvironmentService>();
 
@@ -45,9 +45,12 @@ namespace Saga.Dependency.DI
             RegisterServices?.Invoke(services);
         }
 
-        private static void ConfigureDescarteDataContext(IServiceCollection services)
+        private static void ConfigureDescarteDataContext(AppSettings settings)
         {
-            services.AddDbContext<DescarteDataContext>();
+            DescarteDataContextFactory factory = new DescarteDataContextFactory();
+            string[] args = new string[1] { settings.DescarteDataContext };
+
+            factory.CreateDbContext(args);
         }
 
         private static void AddEmailService(IServiceCollection services, IConfiguration Configuration)
@@ -65,13 +68,5 @@ namespace Saga.Dependency.DI
         {
             return ServiceProvider.GetService<T>();
         }
-
-        //var config = new EmailConfigOptions();
-        //Configuration.Bind(EmailConfigOptions.EmailConfig, config);
-
-        //    services.AddSingleton<EmailConfigOptions>(config);
-
-        //    services.AddTransient<IEmailService, EmailService>();
-
     }
 }
