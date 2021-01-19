@@ -1,16 +1,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Agropop.Database.DataContext;
-using EstoqueLambda.Database.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
-namespace EstoqueLambda.Database.Repository
+namespace Agropop.Database.Repository
 {
-    public class Repository<T> : IRepository<T> where T: class
+    public class Repository<T> : Interfaces.IRepository<T> where T: class
     {
-        protected readonly DescarteDataContext _context;
+        protected readonly DataContext.DescarteDataContext _context;
 
-        public Repository(DescarteDataContext context)
+        public Repository(DataContext.DescarteDataContext context)
         {
             _context = context;
         }

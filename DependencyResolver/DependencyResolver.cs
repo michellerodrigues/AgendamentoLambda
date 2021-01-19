@@ -1,17 +1,7 @@
-﻿using EstoqueLambda.Database.DataContext;
-using EstoqueLambda.DI;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using System;
-using EstoqueLambda.Database.Repository;
-using EstoqueLambda.Database.Interfaces;
-using EmailHelper;
-using Microsoft.Extensions.Configuration;
+﻿using System;
 using System.IO;
-using System.Configuration;
-using Newtonsoft.Json;
 
-namespace EstoqueLambda
+namespace Saga.Dependency.DI
 {
     public class DependencyResolver
     {
@@ -49,7 +39,6 @@ namespace EstoqueLambda
             ConfigureEmailService(services, configuration);
 
             services.AddTransient<IEnvironmentService, EnvironmentService>();
-           // services.AddTransient<IConfigurationService, ConfigurationService>();
             services.AddTransient<IProdutoRepository, ProdutoRepository>();
             services.AddTransient<IEstoqueRepository, EstoqueRepository>();
 

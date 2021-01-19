@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace EstoqueLambda.DI
+namespace Saga.Dependency.DI
 {
     public class EnvironmentService : IEnvironmentService
     {

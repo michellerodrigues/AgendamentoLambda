@@ -1,7 +1,6 @@
-﻿using EstoqueLambda.DI;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using System.IO;
+﻿using System.IO;
+using Saga.Dependency.DI;
+
 
 namespace Microsoft.Extensions.DependencyInjection
 {

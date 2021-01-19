@@ -1,7 +1,10 @@
 using Amazon.Lambda.Core;
+using Amazon.Lambda.SQSEvents;
 using Amazon.SimpleNotificationService;
 using Amazon.SimpleNotificationService.Model;
+using Descarte.Messages;
 using Descarte.Messages.Command;
+using Descarte.Messages.HttpMessages;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -75,6 +78,25 @@ namespace SagaLambda
             await client.PublishAsync(request);
 
             return $"mensagem publicada { teste}";
+        }
+
+        ///// <summary>
+        ///// A simple function that takes a string and does a ToUpper
+        ///// </summary>
+        ///// <param name="input"></param>
+        ///// <param name="context"></param>
+        ///// <returns></returns>
+        ////public async Task FunctionHandler(SQSEvent.SQSMessage message, ILambdaContext context)
+        public async Task FunctionHandler(SQSEvent.SQSMessage message, ILambdaContext context)
+        {
+            BaseMessage baseMsg = JsonConvert.DeserializeObject<BaseMessage>(message.Body);
+            Type tipo = Type.GetType(baseMsg.TypeMsg);
+            dynamic instance = Activator.CreateInstance(tipo, false);
+            HandleSagaMessage(instance);
+        }
+        public static string HandleSagaMessage(SolicitarAgendamentoMessageRequest request)
+        {
+            return "AgendarRetiradaCommand ok";
         }
     }
 }

@@ -1,17 +1,12 @@
+using Agropop.Database.DataContext;
+using Agropop.Database.Interfaces;
+using Agropop.Database.Models;
 using Amazon.Lambda.Core;
-using Amazon.Lambda.SQSEvents;
-using Amazon.SimpleNotificationService;
-using Amazon.SimpleNotificationService.Model;
 using Amazon.SQS;
-using Descarte.Messages;
 using Descarte.Messages.Command;
 using EmailHelper;
-using EstoqueLambda.Database.DataContext;
-using EstoqueLambda.Database.Interfaces;
-using EstoqueLambda.Database.Models;
-using EstoqueLambda.DI;
-using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
+using Saga.Dependency.DI;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -28,14 +23,15 @@ namespace EstoqueLambda
 
         private readonly IEmailService _emailService;
 
+        private readonly InitializeDbContext _initialize;
 
         public Function()
         {
-            var resolver = new DependencyResolver();
-            _estoqueRepository = resolver.ServiceProvider.GetService<IEstoqueRepository>();
-            _emailService = resolver.ServiceProvider.GetService<IEmailService>();
-            
-            var initializeDbContext = new InitializeDbContext();
+            var resolver = new DependencyResolver();           
+            _estoqueRepository = resolver.GetService<IEstoqueRepository>();
+            _emailService = resolver.GetService<IEmailService>();
+             var context = resolver.GetService<DescarteDataContext>();
+            _initialize = new InitializeDbContext(context);            
         }
 
         ///// <summary>
@@ -56,7 +52,7 @@ namespace EstoqueLambda
         //public async Task FunctionHandler(SQSEvent.SQSMessage message, ILambdaContext context)
         public async Task FunctionHandler(int i, ILambdaContext context)
         {
-            _emailService.Enviar("mica.msr@gmail.com", "teste envio lambda", "oi, esta é uma mensagem com acento e quebra de linha \n");
+            await _emailService.Enviar("mica.msr@gmail.com", "teste envio lambda", "oi, esta é uma mensagem com acento e quebra de linha \n");
             
             await Task.CompletedTask;
 
@@ -94,12 +90,12 @@ namespace EstoqueLambda
             return $"Não existem lotes vencidos para descarte";
         }
 
-        public async Task<string> HandleSagaMessage(LotesVencidosVerificadosEvent msg)
+        public string HandleSagaMessage(LotesVencidosVerificadosEvent msg)
         {
             var lotesVencidos = (List<Estoque>)_estoqueRepository.AtualizarLotesEnviadosParaDescarte(msg.Lote);
 
             var client = new AmazonSQSClient();
-            string queue = "https://sqs.sa-east-1.amazonaws.com/428672449531/agendamento";
+        //    string queue = "https://sqs.sa-east-1.amazonaws.com/428672449531/agendamento";
 
             if (lotesVencidos != null)
             {

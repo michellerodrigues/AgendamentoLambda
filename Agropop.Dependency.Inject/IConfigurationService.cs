@@ -1,7 +1,6 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 
-namespace EstoqueLambda.DI
+namespace Saga.Dependency.DI
 {
     public interface IConfigurationService
     {

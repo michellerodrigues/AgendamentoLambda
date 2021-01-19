@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace EstoqueLambda.DI
+namespace Saga.Dependency.DI
 {
     public static class Constants
     {

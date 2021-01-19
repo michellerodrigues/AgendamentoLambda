@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Configuration;
+using System;
 using System.Net;
 using System.Net.Mail;
 using System.Threading.Tasks;
@@ -10,18 +11,20 @@ namespace EmailHelper
 
         private readonly SmtpClient _smtpClient;
         private readonly MailAddress _mailAddress;
-
+        private readonly EmailConfigOptions _emailConfigOptions;
 
         public EmailService(EmailConfigOptions emailConfigOptions)
         {
-            _smtpClient = new SmtpClient(emailConfigOptions.Server.Address, emailConfigOptions.Server.Port)
+            _emailConfigOptions = emailConfigOptions;
+
+            _smtpClient = new SmtpClient(_emailConfigOptions.Server.Address, _emailConfigOptions.Server.Port)
             {
                 UseDefaultCredentials = false,
-                Credentials = new NetworkCredential(emailConfigOptions.Credentials.Username, emailConfigOptions.Credentials.Password),
+                Credentials = new NetworkCredential(_emailConfigOptions.Credentials.Username, _emailConfigOptions.Credentials.Password),
                 EnableSsl = true                
             };
 
-            _mailAddress = new MailAddress(emailConfigOptions.Credentials.Username);
+            _mailAddress = new MailAddress(_emailConfigOptions.Credentials.Username);
 
 
         }

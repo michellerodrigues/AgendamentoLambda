@@ -1,4 +1,4 @@
-﻿namespace EstoqueLambda.DI
+﻿namespace Saga.Dependency.DI
 {
     public interface IEnvironmentService
     {

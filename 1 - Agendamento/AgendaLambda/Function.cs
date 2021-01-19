@@ -1,6 +1,7 @@
 using Amazon.Lambda.Core;
 using Amazon.Lambda.SQSEvents;
 using Amazon.SQS;
+using Descarte.Messages.Command;
 using Descarte.Messages.Event;
 using Newtonsoft.Json;
 using System;
@@ -14,6 +15,8 @@ namespace AgendaLambda
 {
     public class Function
     {
+        //public AppSettings AppSettings { get; }
+        //private readonly IEmailService _emailService;
         /// <summary>
         /// Default constructor. This constructor is used by Lambda to construct the instance. When invoked in a Lambda environment
         /// the AWS credentials will come from the IAM role associated with the function and the AWS region will be set to the
@@ -21,6 +24,11 @@ namespace AgendaLambda
         /// </summary>
         public Function()
         {
+            //var resolver = new DependencyResolver();
+            //_emailService = resolver.ServiceProvider.GetService<IEmailService>();
+
+            //var initializeDbContext = new InitializeDbContext();
+
 
         }
 
@@ -60,4 +68,51 @@ namespace AgendaLambda
             await Task.CompletedTask;
         }
     }
+
+//        var lotesVencidos = (List<Estoque>)_estoqueRepository.FindItensVencidosEstoque();
+//        var lotes = new List<LotesVencidosVerificadosEvent>();
+
+//        var client = new AmazonSQSClient();
+//        string queue = "https://sqs.sa-east-1.amazonaws.com/428672449531/agendamento";
+
+//            if (lotesVencidos != null)
+//            {
+//                foreach (Estoque estoque in lotesVencidos)
+//                {
+//                    LotesVencidosVerificadosEvent lote = new LotesVencidosVerificadosEvent()
+//                    {
+//                        DateMsg = System.DateTime.Now,
+//                        Email = estoque.Fabricante.Email,
+//                        IdMsr = Guid.NewGuid(),
+//                        Lote = estoque.EstoqueId
+//                    };
+//        lote.TypeMsg = lote.GetType().AssemblyQualifiedName;
+
+//                    lotes.Add(lote);
+//                }
+//                foreach (LotesVencidosVerificadosEvent lote in lotes)
+//                {
+//                    await client.SendMessageAsync(queue, JsonConvert.SerializeObject(lote)).ConfigureAwait(false);
+//}
+//                return $"Lotes enviados para a fila : {lotes.Count}";
+//            }
+//            return $"Não existem lotes vencidos para descarte";
+//        }
+
+//        public async Task<string> HandleSagaMessage(AgendarRetiradaCommand msg)
+//        {
+            
+
+//            var client = new AmazonSQSClient();
+//            string queue = "https://sqs.sa-east-1.amazonaws.com/428672449531/agendamento";
+
+//            if (lotesVencidos != null)
+//            {
+//                return $"Lotes Descartados Com Sucesso";
+//            }
+//            return $"Não existem lotes vencidos para descarte";
+//        }
+//    }
+
+
 }

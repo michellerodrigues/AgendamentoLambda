@@ -1,19 +1,18 @@
-using Agropop.Database.DataContext;
-using EstoqueLambda.Database.Interfaces;
-using EstoqueLambda.Database.Models;
-using EstoqueLambda.Database.Repository;
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Agropop.Database.Models;
+using Agropop.Database.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
-namespace EstoqueLambda.Database.Repository
+
+namespace Agropop.Database.Repository
 {
     public class EstoqueRepository : Repository<Estoque>, IEstoqueRepository
     {
 
-        private readonly DescarteDataContext _context;
-        public EstoqueRepository(DescarteDataContext context) : base(context)
+        private new DataContext.DescarteDataContext _context;
+        public EstoqueRepository(DataContext.DescarteDataContext context) : base(context)
         {
             _context = context;
             _context.Estoques.Include(_ => _.Produto).Include(e => e.Revendedor).Include(e => e.Fabricante);
