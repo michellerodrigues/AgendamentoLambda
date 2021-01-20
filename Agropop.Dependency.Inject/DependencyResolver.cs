@@ -1,5 +1,6 @@
 ﻿using Agropop.Database.DataContext;
 using EmailHelper;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -37,20 +38,28 @@ namespace Saga.Dependency.DI
 
             var appSettings = configuration.Get<AppSettings>();
             services.AddSingleton(appSettings);
-            ConfigureDescarteDataContext(appSettings);
-            AddEmailService(services, configuration);
+            var descarteContext = ConfigureDescarteDataContext(appSettings);
+
+            services.AddSingleton(descarteContext);
+
+           // services.AddDbContext<DbContext>(ServiceLifetime.Scoped);
+
+           AddEmailService(services, configuration);
             services.AddTransient<IEnvironmentService, EnvironmentService>();
 
             // Register other services
             RegisterServices?.Invoke(services);
         }
 
-        private static void ConfigureDescarteDataContext(AppSettings settings)
+        private static DescarteDataContext ConfigureDescarteDataContext(AppSettings settings)
         {
             DescarteDataContextFactory factory = new DescarteDataContextFactory();
             string[] args = new string[1] { settings.DescarteDataContext };
 
-            factory.CreateDbContext(args);
+            return factory.CreateDbContext(args);
+            
+           
+
         }
 
         private static void AddEmailService(IServiceCollection services, IConfiguration Configuration)
@@ -67,6 +76,19 @@ namespace Saga.Dependency.DI
         public T GetService<T>() where T: class
         {
             return ServiceProvider.GetService<T>();
+        }
+
+        public DescarteDataContext CreateDbContext(string[] args)
+        {
+            this.CurrentDirectory = Path.Combine(Directory.GetCurrentDirectory(), "../NetCoreLambda");
+            
+            //IConfigurationRoot configuration = new ConfigurationBuilder()
+            //.SetBasePath(Directory.GetCurrentDirectory())
+            //.AddJsonFile("appsettings.json")
+            //.Build();
+            var builder = new DbContextOptionsBuilder<DescarteDataContext>();
+            builder.UseMySql(args[0].ToString());
+            return new DescarteDataContext(builder.Options);
         }
     }
 }
