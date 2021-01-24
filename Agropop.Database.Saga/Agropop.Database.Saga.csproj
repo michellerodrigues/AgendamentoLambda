@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AWSSDK.DynamoDBv2" Version="3.5.4.20" />
+    <PackageReference Include="AWSSDK.Core" Version="3.5.2" />
+    
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Descarte.Messages\Descarte.Messages.csproj" />
+  </ItemGroup>
+  
+  
+  
+</Project>

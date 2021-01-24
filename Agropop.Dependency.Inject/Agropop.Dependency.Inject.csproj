@@ -16,7 +16,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\6 - Helpers\EmailHelper\EmailHelper.csproj" />
-    <ProjectReference Include="..\Agropop.Database\Agropop.Database.csproj" />
+    <ProjectReference Include="..\Agropop.Database\Agropop.Database.Descarte.csproj" />
   </ItemGroup>
  
   
