@@ -1,20 +1,18 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
 using Amazon.Lambda.Core;
-using Amazon.Lambda.SNSEvents;
 using Amazon.SimpleNotificationService;
 using Amazon.SimpleNotificationService.Model;
 using Descarte.Messages.Command;
+using Descarte.Messages.Event;
 using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.SystemTextJson.DefaultLambdaJsonSerializer))]
 
-namespace SagaDescarteLambda
+namespace SagaApiLambda
 {
     public class Function
     {
@@ -36,14 +34,14 @@ namespace SagaDescarteLambda
         /// <param name="evnt"></param>
         /// <param name="context"></param>
         /// <returns></returns>
-        public async Task FunctionHandler(int aa, ILambdaContext context)
+        public async Task FunctionHandler(string idMensagem, ILambdaContext context)
         {
-            //string topicArn = "arn:aws:sns:sa-east-1:428672449531:DescarteSagaTopic";
-
-            string topicArn = "arn:aws:lambda:sa-east-1:428672449531:function:SagaLambda";
-
-            VerificarLotesVencidosCommand message = new VerificarLotesVencidosCommand();
+            string topicArn = "arn:aws:sns:sa-east-1:428672449531:DescarteSagaTopic";
+          
+            RetiradaAgendadaEvent message = new RetiradaAgendadaEvent();
             message.TypeMsg = message.GetType().AssemblyQualifiedName;
+            message.IdMsr = Guid.Parse(idMensagem);
+            message.Email = "mica.msr@gmail.com";
 
             Dictionary<string, MessageAttributeValue> attributos = new Dictionary<string, MessageAttributeValue>();
 

@@ -1,15 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-using Xunit;
-using Amazon.Lambda.TestUtilities;
 using Amazon.Lambda.SNSEvents;
+using Amazon.Lambda.TestUtilities;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Xunit;
 
-using SagaDescarteLambda;
-
-namespace SagaDescarteLambda.Tests
+namespace SagaApiLambda.Tests
 {
     public class FunctionTest
     {

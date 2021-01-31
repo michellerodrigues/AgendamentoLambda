@@ -5,35 +5,42 @@ using System.Threading.Tasks;
 
 namespace Agropop.Database.Saga
 {
-    public class SagaDynamoService
+    public class SagaDynamoRepository : ISagaDynamoRepository
     {
-        private static AmazonDynamoDBClient client = new AmazonDynamoDBClient();
+        private readonly AmazonDynamoDBClient _client;
 
-        public async static Task<string> BuscarMensagemAgendamento(string msgId)
+        private readonly AwsConfigOptions _awsConfigOptions;
+        public SagaDynamoRepository(AmazonDynamoDBClient client, AwsConfigOptions awsConfigOptions)
         {
-            DynamoDBContext context = new DynamoDBContext(client);
+            _awsConfigOptions = awsConfigOptions;
+            _client = client;            
+        }
+
+        public async Task<object> BuscarMensagemAgendamento(string msgId)
+        {
+            DynamoDBContext context = new DynamoDBContext(_client);
 
             var retorno = await GetSagaMessage(context, msgId);
 
             return retorno.BodyMessage;
         }
 
-        public async static Task<bool> IncluirMensagemAgendamento(string msg, string msgId)
+        public async Task<bool> IncluirMensagemAgendamento(object msg, string msgId)
         {
-            DynamoDBContext context = new DynamoDBContext(client);
+            DynamoDBContext context = new DynamoDBContext(_client);
                         
             return await PutSagaMessage(context, msg, msgId);
         }
 
 
-        private async static Task<SagaMessageTable> GetSagaMessage(DynamoDBContext context, string msgId)
+        private async Task<SagaMessageTable> GetSagaMessage(DynamoDBContext context, string msgId)
         {
             SagaMessageTable sagaItem = await context.LoadAsync<SagaMessageTable>(msgId).ConfigureAwait(false);
 
             return sagaItem;
         }
 
-        private async static Task<bool> PutSagaMessage(DynamoDBContext context, string msg, string msgId)
+        private async Task<bool> PutSagaMessage(DynamoDBContext context, object msg, string msgId)
         {
             
             SagaMessageTable sampleTableItems = new SagaMessageTable

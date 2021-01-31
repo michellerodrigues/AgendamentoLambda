@@ -13,7 +13,7 @@ namespace Agropop.Database.Saga.Tables
         }
         
         // Properties included implicitly.
-        public string BodyMessage
+        public Object BodyMessage
         {
             get; set;
         }

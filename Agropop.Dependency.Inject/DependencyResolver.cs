@@ -1,4 +1,5 @@
 ﻿using Agropop.Database.DataContext;
+using Agropop.Database.Saga;
 using EmailHelper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -46,7 +47,7 @@ namespace Saga.Dependency.DI
 
            AddEmailService(services, configuration);
             services.AddTransient<IEnvironmentService, EnvironmentService>();
-
+           AddDynamoDBService(services, configuration);
             // Register other services
             RegisterServices?.Invoke(services);
         }
@@ -72,6 +73,15 @@ namespace Saga.Dependency.DI
             services.AddTransient<IEmailService, EmailService>();
         }
     
+        private static void AddDynamoDBService(IServiceCollection services, IConfiguration Configuration)
+        {
+            var config = new AwsConfigOptions();
+            Configuration.Bind(AwsConfigOptions.AWSConfig, config);
+
+            services.AddSingleton<AwsConfigOptions>(config);
+
+            services.AddScoped<ISagaDynamoRepository, SagaDynamoRepository>();
+        }
 
         public T GetService<T>() where T: class
         {

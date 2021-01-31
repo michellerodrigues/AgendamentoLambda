@@ -1,9 +1,14 @@
+using Agropop.Database.DataContext;
+using Agropop.Database.Saga;
 using Amazon.Lambda.Core;
 using Amazon.Lambda.SQSEvents;
 using Amazon.SQS;
+using Descarte.Messages;
 using Descarte.Messages.Command;
 using Descarte.Messages.Event;
+using EmailHelper;
 using Newtonsoft.Json;
+using Saga.Dependency.DI;
 using System;
 using System.Threading.Tasks;
 
@@ -16,7 +21,8 @@ namespace AgendaLambda
     public class Function
     {
         //public AppSettings AppSettings { get; }
-        //private readonly IEmailService _emailService;
+        private readonly IEmailService _emailService;
+        private readonly ISagaDynamoRepository _sagaDynamoRepository;
         /// <summary>
         /// Default constructor. This constructor is used by Lambda to construct the instance. When invoked in a Lambda environment
         /// the AWS credentials will come from the IAM role associated with the function and the AWS region will be set to the
@@ -24,12 +30,9 @@ namespace AgendaLambda
         /// </summary>
         public Function()
         {
-            //var resolver = new DependencyResolver();
-            //_emailService = resolver.ServiceProvider.GetService<IEmailService>();
-
-            //var initializeDbContext = new InitializeDbContext();
-
-
+            var resolver = new DependencyResolver();
+            _emailService = resolver.GetService<IEmailService>();
+            _sagaDynamoRepository = resolver.GetService<ISagaDynamoRepository>();
         }
 
 
@@ -67,52 +70,46 @@ namespace AgendaLambda
 
             await Task.CompletedTask;
         }
+
+        ///// <summary>
+        ///// A simple function that takes a string and does a ToUpper
+        ///// </summary>
+        ///// <param name="input"></param>
+        ///// <param name="context"></param>
+        ///// <returns></returns>
+        ////public async Task FunctionHandler(SQSEvent.SQSMessage message, ILambdaContext context)
+        public async Task FunctionHandler(SQSEvent.SQSMessage message, ILambdaContext context)
+        {
+            BaseMessage baseMsg = JsonConvert.DeserializeObject<BaseMessage>(message.Body);
+            Type tipo = Type.GetType(baseMsg.TypeMsg);
+            dynamic instance = Activator.CreateInstance(tipo, false);
+            HandleSagaMessage(instance);
+        }
+        public string HandleSagaMessage(AgendarRetiradaCommand request)
+        {
+            //salvar mensagem no dynamo
+            _sagaDynamoRepository.IncluirMensagemAgendamento(request, request.IdMsr.ToString());
+
+            _emailService.Enviar(request.Email, $"Retirada Pendendente Lote {request.IdMsr}", String.Format("Http://api-saga-gateway/api/agendarRetiradaCommand?idMsr={0}",request.IdMsr));
+            //enviar mensagem para o tópico e evento
+            //quando receber o evento, enviar o email e mandar para o topico outro evento para a triagem
+            //enviar o email para o cidadão
+            return "AgendarRetiradaCommand ok";
+        }
+
+        public async Task<string> HandleSagaMessage(RetiradaAgendadaEvent request)
+        {
+            var obj = await _sagaDynamoRepository.BuscarMensagemAgendamento( request.IdMsr.ToString()).ConfigureAwait(false);
+
+            string agendamentoString = JsonConvert.SerializeObject(obj);
+
+            AgendarRetiradaCommand agendarRetiradaCommand = JsonConvert.DeserializeObject<AgendarRetiradaCommand>(agendamentoString);
+            //quando  o cidadão clicar no e-mail, uma mensagem será colocada na fila RetiradaAgendadaEvent e irá cair aqui
+            //enviar mensagem para o tópico e evento
+            //quando receber o evento, enviar o email e mandar para o topico outro evento para a triagem
+
+            return "AgendarRetiradaCommand ok";
+        }
+
     }
-
-//        var lotesVencidos = (List<Estoque>)_estoqueRepository.FindItensVencidosEstoque();
-//        var lotes = new List<LotesVencidosVerificadosEvent>();
-
-//        var client = new AmazonSQSClient();
-//        string queue = "https://sqs.sa-east-1.amazonaws.com/428672449531/agendamento";
-
-//            if (lotesVencidos != null)
-//            {
-//                foreach (Estoque estoque in lotesVencidos)
-//                {
-//                    LotesVencidosVerificadosEvent lote = new LotesVencidosVerificadosEvent()
-//                    {
-//                        DateMsg = System.DateTime.Now,
-//                        Email = estoque.Fabricante.Email,
-//                        IdMsr = Guid.NewGuid(),
-//                        Lote = estoque.EstoqueId
-//                    };
-//        lote.TypeMsg = lote.GetType().AssemblyQualifiedName;
-
-//                    lotes.Add(lote);
-//                }
-//                foreach (LotesVencidosVerificadosEvent lote in lotes)
-//                {
-//                    await client.SendMessageAsync(queue, JsonConvert.SerializeObject(lote)).ConfigureAwait(false);
-//}
-//                return $"Lotes enviados para a fila : {lotes.Count}";
-//            }
-//            return $"Não existem lotes vencidos para descarte";
-//        }
-
-//        public async Task<string> HandleSagaMessage(AgendarRetiradaCommand msg)
-//        {
-            
-
-//            var client = new AmazonSQSClient();
-//            string queue = "https://sqs.sa-east-1.amazonaws.com/428672449531/agendamento";
-
-//            if (lotesVencidos != null)
-//            {
-//                return $"Lotes Descartados Com Sucesso";
-//            }
-//            return $"Não existem lotes vencidos para descarte";
-//        }
-//    }
-
-
 }

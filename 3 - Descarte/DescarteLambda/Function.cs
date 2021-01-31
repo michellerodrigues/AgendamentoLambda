@@ -1,50 +1,90 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Threading.Tasks;
-
+using Agropop.Database.Saga;
 using Amazon.Lambda.Core;
+using Amazon.SimpleNotificationService;
+using Amazon.SimpleNotificationService.Model;
 using Descarte.Messages;
 using Descarte.Messages.Command;
+using Descarte.Messages.Event;
 using Newtonsoft.Json;
+using Saga.Dependency.DI;
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.SystemTextJson.DefaultLambdaJsonSerializer))]
 
 namespace DescarteLambda
 {
+
+
     public class Function
     {
-        
+        private readonly ISagaDynamoRepository _sagaDynamoRepository;
+
+        public Function()
+        {
+            var resolver = new DependencyResolver();
+            _sagaDynamoRepository = resolver.GetService<ISagaDynamoRepository>();
+        }
         /// <summary>
         /// A simple function that takes a string and does a ToUpper
         /// </summary>
         /// <param name="input"></param>
         /// <param name="context"></param>
         /// <returns></returns>
-        public string FunctionHandler(int input, ILambdaContext context)
+        public async Task<string> FunctionHandler(string idMsg, ILambdaContext context)
         {
-            string inputString= "{\"Email\": \"mica-fabricante2@mailinator.com\",\"Lote\": \"9bd89eeb-ee99-4f46-b461-93b9b495eeb9\",\"IdMsr\": \"41b02429-ad8b-4493-8656-31f0fbea51a3\",\"DateMsg\": \"2021-01-03T12:27:40.150953-03:00\", \"TypeMsg\": \"Descarte.Messages.Command.LoteVencidoParaDescartarCommand, Descarte.Messages, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null\"}";
-            
-            BaseMessage baseMsg = JsonConvert.DeserializeObject<BaseMessage>(inputString);           
-            
-            Type tipo = Type.GetType(baseMsg.TypeMsg);
 
-            dynamic instance = Activator.CreateInstance(tipo, false);
+            //buscar id da mensagem no dynamo
 
-            return HandleSagaMessage(instance);
+            string topicArn = "arn:aws:sns:sa-east-1:428672449531:DescarteSagaTopic";
+
+            RetiradaAgendadaEvent retiradaAgendadaEvent = new RetiradaAgendadaEvent()
+            {
+                IdMsr = Guid.Parse(idMsg),
+                Email = "mica.msr@gmail.com"
+            };
+            retiradaAgendadaEvent.TypeMsg = retiradaAgendadaEvent.GetType().AssemblyQualifiedName;
+
+
+            Dictionary<string, MessageAttributeValue> attributos = new Dictionary<string, MessageAttributeValue>();
+
+            byte[] byteArray = Encoding.UTF8.GetBytes(retiradaAgendadaEvent.GetType().AssemblyQualifiedName);
+
+            var stream = new MemoryStream(byteArray);
+            stream.Position = 0;
+
+            MessageAttributeValue attrib = new MessageAttributeValue()
+            {
+                StringValue = retiradaAgendadaEvent.GetType().AssemblyQualifiedName,
+                DataType = "String"
+            };
+
+            attributos.Add("typeMsg", attrib);
+
+            return await PublicarNoTopico(topicArn, JsonConvert.SerializeObject(retiradaAgendadaEvent), attributos);
         }
 
-        //public static string HandleSagaMessage(LoteVencidoParaDescartarCommand lote)
-        //{
-        //    return "LoteVencidoParaDescartarCommand ok";
-        //}
-
-        public static string HandleSagaMessage(AgendarRetiradaCommand lote)
+        public async Task<string> PublicarNoTopico(string topicArn, string message, Dictionary<string, MessageAttributeValue> attributos)
         {
-            return "AgendarRetiradaCommand ok";
-        }
+            var client = new AmazonSimpleNotificationServiceClient(region: Amazon.RegionEndpoint.SAEast1);
 
+            var request = new PublishRequest()
+            {
+                Message = message,
+                MessageAttributes = attributos,
+                TopicArn = topicArn
+            };
+
+            string teste = JsonConvert.SerializeObject(request);
+            await client.PublishAsync(request);
+
+            return $"mensagem publicada { teste}";
+        }
     }
 }
