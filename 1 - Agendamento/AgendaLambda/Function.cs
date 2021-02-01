@@ -43,33 +43,33 @@ namespace AgendaLambda
         /// <param name="evnt"></param>
         /// <param name="context"></param>
         /// <returns></returns>
-        public async Task FunctionHandler(SQSEvent evnt, ILambdaContext context)
-        {
-            foreach (var message in evnt.Records)
-            {
-                await ProcessMessageAsync(message, context);
-            }
-        }
+        //public async Task FunctionHandler(SQSEvent evnt, ILambdaContext context)
+        //{
+        //    foreach (var message in evnt.Records)
+        //    {
+        //        await ProcessMessageAsync(message, context);
+        //    }
+        //}
 
-        private async Task ProcessMessageAsync(SQSEvent.SQSMessage message, ILambdaContext context)
-        {
-            context.Logger.LogLine($"Processed message '{message.Body}'");
+        //private async Task ProcessMessageAsync(SQSEvent.SQSMessage message, ILambdaContext context)
+        //{
+        //    context.Logger.LogLine($"Processed message '{message.Body}'");
 
-            // TODO: Do interesting work based on the new message
+        //    // TODO: Do interesting work based on the new message
 
-            var client = new AmazonSQSClient();
-            string topic = "https://sqs.sa-east-1.amazonaws.com/428672449531/agendamento_events_sqs";
+        //    var client = new AmazonSQSClient();
+        //    string topic = "https://sqs.sa-east-1.amazonaws.com/428672449531/agendamento_events_sqs";
 
-            RetiradaAgendadaEvent evento = new RetiradaAgendadaEvent()
-            {
-                DateMsg = DateTime.Now,
-                ReceivedMessage = message.Body
-            };
+        //    RetiradaAgendadaEvent evento = new RetiradaAgendadaEvent()
+        //    {
+        //        DateMsg = DateTime.Now,
+        //        ReceivedMessage = message.Body
+        //    };
 
-            await client.SendMessageAsync(topic, JsonConvert.SerializeObject(evento)).ConfigureAwait(false);
+        //    await client.SendMessageAsync(topic, JsonConvert.SerializeObject(evento)).ConfigureAwait(false);
 
-            await Task.CompletedTask;
-        }
+        //    await Task.CompletedTask;
+        //}
 
         ///// <summary>
         ///// A simple function that takes a string and does a ToUpper
@@ -83,14 +83,14 @@ namespace AgendaLambda
             BaseMessage baseMsg = JsonConvert.DeserializeObject<BaseMessage>(message.Body);
             Type tipo = Type.GetType(baseMsg.TypeMsg);
             dynamic instance = Activator.CreateInstance(tipo, false);
-            HandleSagaMessage(instance);
+            await HandleSagaMessage(instance);
         }
-        public string HandleSagaMessage(AgendarRetiradaCommand request)
+        public async Task<string> HandleSagaMessage(AgendarRetiradaCommand request)
         {
             //salvar mensagem no dynamo
-            _sagaDynamoRepository.IncluirMensagemAgendamento(request, request.IdMsr.ToString());
+            await _sagaDynamoRepository.IncluirMensagemAgendamento(request, request.IdMsr.ToString());
 
-            _emailService.Enviar(request.Email, $"Retirada Pendendente Lote {request.IdMsr}", String.Format("Http://api-saga-gateway/api/agendarRetiradaCommand?idMsr={0}",request.IdMsr));
+            await _emailService.Enviar(request.Email, $"Retirada Pendendente Lote {request.IdMsr}", String.Format("Http://api-saga-gateway/api/agendarRetiradaCommand?idMsr={0}",request.IdMsr));
             //enviar mensagem para o tópico e evento
             //quando receber o evento, enviar o email e mandar para o topico outro evento para a triagem
             //enviar o email para o cidadão
@@ -99,16 +99,20 @@ namespace AgendaLambda
 
         public async Task<string> HandleSagaMessage(RetiradaAgendadaEvent request)
         {
-            var obj = await _sagaDynamoRepository.BuscarMensagemAgendamento( request.IdMsr.ToString()).ConfigureAwait(false);
 
-            string agendamentoString = JsonConvert.SerializeObject(obj);
+            await _emailService.Enviar(request.Email, $"Retirada Agendada Lote {request.IdMsr}", String.Format("Http://api-saga-gateway/api/agendarRetiradaCommand?idMsr={0}", request.IdMsr));
 
-            AgendarRetiradaCommand agendarRetiradaCommand = JsonConvert.DeserializeObject<AgendarRetiradaCommand>(agendamentoString);
-            //quando  o cidadão clicar no e-mail, uma mensagem será colocada na fila RetiradaAgendadaEvent e irá cair aqui
-            //enviar mensagem para o tópico e evento
-            //quando receber o evento, enviar o email e mandar para o topico outro evento para a triagem
 
-            return "AgendarRetiradaCommand ok";
+            //var obj = await _sagaDynamoRepository.BuscarMensagemAgendamento( request.IdMsr.ToString()).ConfigureAwait(false);
+
+            //string agendamentoString = JsonConvert.SerializeObject(obj);
+
+            //AgendarRetiradaCommand agendarRetiradaCommand = JsonConvert.DeserializeObject<AgendarRetiradaCommand>(agendamentoString);
+            ////quando  o cidadão clicar no e-mail, uma mensagem será colocada na fila RetiradaAgendadaEvent e irá cair aqui
+            ////enviar mensagem para o tópico e evento
+            ////quando receber o evento, enviar o email e mandar para o topico outro evento para a triagem
+
+            return "RetiradaAgendadaEvent ok";
         }
 
     }
