@@ -47,7 +47,8 @@ namespace SagaApiLambda
 
             MessageAttributeValue values = new MessageAttributeValue()
             {
-                StringValue = message.GetType().AssemblyQualifiedName
+                StringValue = message.GetType().AssemblyQualifiedName,
+                DataType="String"
             };
             attributos.Add("typeMsg", values);
 
@@ -63,7 +64,7 @@ namespace SagaApiLambda
             {
                 Message = message,
                 TopicArn = topicArn,
-                TargetArn = topicArn,
+               /* TargetArn = topicArn,*/
                 MessageAttributes = attributos
             };
 
