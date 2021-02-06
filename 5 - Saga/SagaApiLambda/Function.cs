@@ -1,9 +1,11 @@
 using Amazon.Lambda.Core;
 using Amazon.SimpleNotificationService;
 using Amazon.SimpleNotificationService.Model;
-using Descarte.Messages.Command;
+using Descarte.Messages;
 using Descarte.Messages.Event;
+using EmailHelper;
 using Newtonsoft.Json;
+using Saga.Dependency.DI;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -16,6 +18,7 @@ namespace SagaApiLambda
 {
     public class Function
     {
+        private readonly IEmailService _emailService;
         /// <summary>
         /// Default constructor. This constructor is used by Lambda to construct the instance. When invoked in a Lambda environment
         /// the AWS credentials will come from the IAM role associated with the function and the AWS region will be set to the
@@ -23,7 +26,8 @@ namespace SagaApiLambda
         /// </summary>
         public Function()
         {
-
+            var resolver = new DependencyResolver();
+            _emailService = resolver.GetService<IEmailService>();
         }
 
 
@@ -34,13 +38,16 @@ namespace SagaApiLambda
         /// <param name="evnt"></param>
         /// <param name="context"></param>
         /// <returns></returns>
-        public async Task FunctionHandler(string idMensagem, ILambdaContext context)
+        public async Task FunctionHandler(Object mensagem, ILambdaContext context)
         {
             string topicArn = "arn:aws:sns:sa-east-1:428672449531:DescarteSagaTopic";
-          
+            string idMensagemString = JsonConvert.SerializeObject(mensagem);
+
+            BaseMessage baseMsg = JsonConvert.DeserializeObject<BaseMessage>(idMensagemString);
+
             RetiradaAgendadaEvent message = new RetiradaAgendadaEvent();
             message.TypeMsg = message.GetType().AssemblyQualifiedName;
-            message.IdMsr = Guid.Parse(idMensagem);
+            message.IdMsr = baseMsg.IdMensagem;
             message.Email = "mica.msr@gmail.com";
 
             Dictionary<string, MessageAttributeValue> attributos = new Dictionary<string, MessageAttributeValue>();
@@ -52,7 +59,9 @@ namespace SagaApiLambda
             };
             attributos.Add("typeMsg", values);
 
-            await ProcessRecordAsync(topicArn, JsonConvert.SerializeObject(message), attributos);
+            await _emailService.Enviar(message.Email, $"Retirada Agendada Lote {message.IdMsr}", String.Format("Http://api-saga-gateway/api/agendarRetiradaCommand?idMsr={0}", message.IdMsr));
+
+            // await ProcessRecordAsync(topicArn, JsonConvert.SerializeObject(message), attributos);
 
         }
 

@@ -35,7 +35,7 @@ namespace AgendamentoLambda.Tests
             };
 
             var function = new Function();
-            await function.FunctionHandler(sqsEvent, context);
+            await function.FunctionHandler(sqsEvent.Records.FirstOrDefault(), context);
 
             Assert.Contains("Processed message foobar", logger.Buffer.ToString());
         }

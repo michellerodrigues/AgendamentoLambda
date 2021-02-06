@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-using System;
+﻿using System;
 using System.Net;
 using System.Net.Mail;
 using System.Threading.Tasks;
@@ -17,22 +16,29 @@ namespace EmailHelper
         {
             _emailConfigOptions = emailConfigOptions;
 
-            _smtpClient = new SmtpClient(_emailConfigOptions.Server.Address, _emailConfigOptions.Server.Port)
-            {
-                UseDefaultCredentials = false,
-                Credentials = new NetworkCredential(_emailConfigOptions.Credentials.Username, _emailConfigOptions.Credentials.Password),
-                EnableSsl = true                
-            };
-
             _mailAddress = new MailAddress(_emailConfigOptions.Credentials.Username);
+
+            _smtpClient = new System.Net.Mail.SmtpClient(_emailConfigOptions.Server.Address, _emailConfigOptions.Server.Port)
+            {
+                // Pass SMTP credentials
+                Credentials =
+                    new NetworkCredential(_emailConfigOptions.Credentials.Username, _emailConfigOptions.Credentials.Password),
+
+                // Enable SSL encryption
+                EnableSsl = true,
+                DeliveryMethod = SmtpDeliveryMethod.Network,
+                Timeout= 20_000
+            };
 
 
         }
 
+        
         public async Task<bool> Enviar(string remetente, string assunto, string mensagem)
         {
             try
             {
+                
 
                 MailMessage mail = new MailMessage();
                 mail.From = _mailAddress;
@@ -49,7 +55,7 @@ namespace EmailHelper
             }
             catch (Exception ex)
             {
-                throw new InvalidOperationException("Exception in sendEmail:" + ex.Message);
+                throw new InvalidOperationException("Exception in sendEmail:" + ex.Message + " | "+ ex.StackTrace);
             }
         }
     }

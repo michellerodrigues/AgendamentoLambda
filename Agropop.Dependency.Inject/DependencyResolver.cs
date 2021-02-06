@@ -70,7 +70,7 @@ namespace Saga.Dependency.DI
 
             services.AddSingleton<EmailConfigOptions>(config);
 
-            services.AddTransient<IEmailService, EmailService>();
+            services.AddScoped<IEmailService, EmailService>();
         }
     
         private static void AddDynamoDBService(IServiceCollection services, IConfiguration Configuration)

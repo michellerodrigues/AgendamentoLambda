@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
@@ -8,6 +8,14 @@
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="appsettings.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="Amazon.Lambda.Core" Version="1.2.0" />
     <PackageReference Include="Amazon.Lambda.Serialization.SystemTextJson" Version="2.1.0" />
     <PackageReference Include="Amazon.Lambda.SNSEvents" Version="1.2.0" />
@@ -16,5 +24,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Descarte.Messages\Descarte.Messages.csproj" />
+    <ProjectReference Include="..\..\6 - Helpers\EmailHelper\EmailHelper.csproj" />
+    <ProjectReference Include="..\..\Agropop.Dependency.Inject\Agropop.Dependency.Inject.csproj" />
   </ItemGroup>
 </Project>
