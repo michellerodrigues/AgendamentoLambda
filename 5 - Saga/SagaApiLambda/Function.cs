@@ -1,3 +1,4 @@
+using Amazon.Lambda.APIGatewayEvents;
 using Amazon.Lambda.Core;
 using Amazon.SimpleNotificationService;
 using Amazon.SimpleNotificationService.Model;
@@ -5,9 +6,12 @@ using Descarte.Messages;
 using Descarte.Messages.Event;
 using EmailHelper;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Saga.Dependency.DI;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 
 
@@ -38,16 +42,35 @@ namespace SagaApiLambda
         /// <param name="evnt"></param>
         /// <param name="context"></param>
         /// <returns></returns>
-        public async Task FunctionHandler(Object mensagem, ILambdaContext context)
+        public void FunctionHandler(Stream inputStream, ILambdaContext context)
         {
             string topicArn = "arn:aws:sns:sa-east-1:428672449531:DescarteSagaTopic";
-            string idMensagemString = JsonConvert.SerializeObject(mensagem);
 
-            BaseMessage baseMsg = JsonConvert.DeserializeObject<BaseMessage>(idMensagemString);
+            LambdaRequestMessage idMensagemString = null;
+
+            inputStream.Position = 0;
+            using (StreamReader reader = new StreamReader(inputStream, Encoding.UTF8))
+            {
+                string mensagemRequest = reader.ReadToEnd();
+
+                idMensagemString = JsonConvert.DeserializeObject<LambdaRequestMessage>(mensagemRequest);
+
+                //return idMensagemString;
+            }
+
+
+            //  return inputStream;
+
+          //  string idMensagemString = Convert.ToString(inputStream);
+
+
+            //string idMensagemString = JsonConvert.SerializeObject(inputStream);
+
+            //BaseMessage baseMsg = JsonConvert.DeserializeObject<BaseMessage>(idMensagemString);
 
             RetiradaAgendadaEvent message = new RetiradaAgendadaEvent();
             message.TypeMsg = message.GetType().AssemblyQualifiedName;
-            message.IdMsr = baseMsg.IdMensagem;
+            message.IdMsr = Guid.Parse(idMensagemString.Parametros.querystring.msgid);
             message.Email = "mica.msr@gmail.com";
 
             Dictionary<string, MessageAttributeValue> attributos = new Dictionary<string, MessageAttributeValue>();
@@ -55,13 +78,13 @@ namespace SagaApiLambda
             MessageAttributeValue values = new MessageAttributeValue()
             {
                 StringValue = message.GetType().AssemblyQualifiedName,
-                DataType="String"
+                DataType="String"               
             };
             attributos.Add("typeMsg", values);
 
-            await _emailService.Enviar(message.Email, $"Retirada Agendada Lote {message.IdMsr}", String.Format("Http://api-saga-gateway/api/agendarRetiradaCommand?idMsr={0}", message.IdMsr));
+            _emailService.Enviar(message.Email, $"Retirada Agendada Lote {message.IdMsr}", String.Format("Http://api-saga-gateway/api/agendarRetiradaCommand?idMsr={0}", idMensagemString.Parametros.querystring.msgid));
 
-            // await ProcessRecordAsync(topicArn, JsonConvert.SerializeObject(message), attributos);
+             ProcessRecordAsync(topicArn, JsonConvert.SerializeObject(message), attributos).ConfigureAwait(false).GetAwaiter().GetResult();
 
         }
 
