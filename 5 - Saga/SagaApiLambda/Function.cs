@@ -1,3 +1,4 @@
+using Agropop.Database.Saga;
 using Amazon.Lambda.APIGatewayEvents;
 using Amazon.Lambda.Core;
 using Amazon.SimpleNotificationService;
@@ -23,6 +24,7 @@ namespace SagaApiLambda
     public class Function
     {
         private readonly IEmailService _emailService;
+        private readonly ISagaDynamoRepository _sagaDynamoRepository;
         /// <summary>
         /// Default constructor. This constructor is used by Lambda to construct the instance. When invoked in a Lambda environment
         /// the AWS credentials will come from the IAM role associated with the function and the AWS region will be set to the
@@ -32,6 +34,7 @@ namespace SagaApiLambda
         {
             var resolver = new DependencyResolver();
             _emailService = resolver.GetService<IEmailService>();
+            _sagaDynamoRepository = resolver.GetService<ISagaDynamoRepository>();
         }
 
 
@@ -42,7 +45,7 @@ namespace SagaApiLambda
         /// <param name="evnt"></param>
         /// <param name="context"></param>
         /// <returns></returns>
-        public void FunctionHandler(Stream inputStream, ILambdaContext context)
+         public async Task<Object> FunctionHandler(Stream inputStream, ILambdaContext context)
         {
             string topicArn = "arn:aws:sns:sa-east-1:428672449531:DescarteSagaTopic";
 
@@ -54,37 +57,38 @@ namespace SagaApiLambda
                 string mensagemRequest = reader.ReadToEnd();
 
                 idMensagemString = JsonConvert.DeserializeObject<LambdaRequestMessage>(mensagemRequest);
-
-                //return idMensagemString;
             }
 
 
-            //  return inputStream;
+            RetiradaAgendadaEvent request = new RetiradaAgendadaEvent();
+            request.TypeMsg = request.GetType().AssemblyQualifiedName;
+            request.IdMsr = Guid.Parse(idMensagemString.Parametros.querystring.msgid);
+            request.Email = "mica.msr@gmail.com";
 
-          //  string idMensagemString = Convert.ToString(inputStream);
+            await _sagaDynamoRepository.IncluirMensagemAgendamento(request, request.IdMsr.ToString());
+            
+            var mensagem = _sagaDynamoRepository.BuscarMensagemAgendamento(idMensagemString.Parametros.querystring.msgid);
 
-
-            //string idMensagemString = JsonConvert.SerializeObject(inputStream);
-
-            //BaseMessage baseMsg = JsonConvert.DeserializeObject<BaseMessage>(idMensagemString);
-
-            RetiradaAgendadaEvent message = new RetiradaAgendadaEvent();
-            message.TypeMsg = message.GetType().AssemblyQualifiedName;
-            message.IdMsr = Guid.Parse(idMensagemString.Parametros.querystring.msgid);
-            message.Email = "mica.msr@gmail.com";
-
-            Dictionary<string, MessageAttributeValue> attributos = new Dictionary<string, MessageAttributeValue>();
-
-            MessageAttributeValue values = new MessageAttributeValue()
+            if(mensagem!=null)
             {
-                StringValue = message.GetType().AssemblyQualifiedName,
-                DataType="String"               
-            };
-            attributos.Add("typeMsg", values);
+                string messagestring = JsonConvert.SerializeObject(mensagem);
 
-            _emailService.Enviar(message.Email, $"Retirada Agendada Lote {message.IdMsr}", String.Format("Http://api-saga-gateway/api/agendarRetiradaCommand?idMsr={0}", idMensagemString.Parametros.querystring.msgid));
+                RetiradaAgendadaEvent message = JsonConvert.DeserializeObject<RetiradaAgendadaEvent>(messagestring);
 
-             ProcessRecordAsync(topicArn, JsonConvert.SerializeObject(message), attributos).ConfigureAwait(false).GetAwaiter().GetResult();
+                Dictionary<string, MessageAttributeValue> attributos = new Dictionary<string, MessageAttributeValue>();
+
+                MessageAttributeValue values = new MessageAttributeValue()
+                {
+                    StringValue = message.GetType().AssemblyQualifiedName,
+                    DataType = "String"
+                };
+                attributos.Add("typeMsg", values);
+
+                //  _emailService.Enviar(message.Email, $"Retirada Agendada Lote {message.IdMsr}", String.Format("Http://api-saga-gateway/api/agendarRetiradaCommand?idMsr={0}", idMensagemString.Parametros.querystring.msgid));
+
+                ProcessRecordAsync(topicArn, JsonConvert.SerializeObject(message), attributos).ConfigureAwait(false).GetAwaiter().GetResult();
+            }
+            return mensagem;
 
         }
 
