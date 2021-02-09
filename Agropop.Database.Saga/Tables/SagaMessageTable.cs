@@ -10,17 +10,6 @@ namespace Agropop.Database.Saga.Tables
         public string IdMsg
         {
             get; set;
-        }
-
-        public string TypeMessage
-        {
-            get; set;
-        }
-
-        public string Message
-        {
-            get; set;
-        }
-
+        }        
     }
 }

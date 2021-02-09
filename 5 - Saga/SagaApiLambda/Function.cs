@@ -45,31 +45,67 @@ namespace SagaApiLambda
         /// <param name="evnt"></param>
         /// <param name="context"></param>
         /// <returns></returns>
-         public async Task<Object> FunctionHandler(Stream inputStream, ILambdaContext context)
+        // public async Task<Object> FunctionHandler(Stream inputStream, ILambdaContext context)
+        //{
+        //    string topicArn = "arn:aws:sns:sa-east-1:428672449531:DescarteSagaTopic";
+
+        //    LambdaRequestMessage idMensagemString = null;
+
+        //    inputStream.Position = 0;
+        //    using (StreamReader reader = new StreamReader(inputStream, Encoding.UTF8))
+        //    {
+        //        string mensagemRequest = reader.ReadToEnd();
+
+        //        idMensagemString = JsonConvert.DeserializeObject<LambdaRequestMessage>(mensagemRequest);
+        //    }
+
+
+        //    BaseMessage request = new RetiradaAgendadaEvent();
+        //    request.TypeMsg = request.GetType().AssemblyQualifiedName;
+        //    request.IdMsr = Guid.Parse(idMensagemString.Parametros.querystring.msgid);
+        //    request.Email = "mica.msr@gmail.com";
+                        
+        //    await _sagaDynamoRepository.IncluirMensagemAgendamento(request);
+            
+        //    var mensagem = _sagaDynamoRepository.BuscarMensagemAgendamento<BaseMessage>(idMensagemString.Parametros.querystring.msgid);
+
+        //    if(mensagem!=null)
+        //    {
+        //        string messagestring = JsonConvert.SerializeObject(mensagem);
+
+        //        RetiradaAgendadaEvent message = JsonConvert.DeserializeObject<RetiradaAgendadaEvent>(messagestring);
+
+        //        Dictionary<string, MessageAttributeValue> attributos = new Dictionary<string, MessageAttributeValue>();
+
+        //        MessageAttributeValue values = new MessageAttributeValue()
+        //        {
+        //            StringValue = message.GetType().AssemblyQualifiedName,
+        //            DataType = "String"
+        //        };
+        //        attributos.Add("typeMsg", values);
+
+        //        //  _emailService.Enviar(message.Email, $"Retirada Agendada Lote {message.IdMsr}", String.Format("Http://api-saga-gateway/api/agendarRetiradaCommand?idMsr={0}", idMensagemString.Parametros.querystring.msgid));
+
+        //        ProcessRecordAsync(topicArn, JsonConvert.SerializeObject(message), attributos).ConfigureAwait(false).GetAwaiter().GetResult();
+        //    }
+        //    return mensagem;
+
+        //}
+
+        public async Task<Object> FunctionHandler(LambdaRequestMessage idMensagemString, ILambdaContext context)
         {
             string topicArn = "arn:aws:sns:sa-east-1:428672449531:DescarteSagaTopic";
 
-            LambdaRequestMessage idMensagemString = null;
-
-            inputStream.Position = 0;
-            using (StreamReader reader = new StreamReader(inputStream, Encoding.UTF8))
-            {
-                string mensagemRequest = reader.ReadToEnd();
-
-                idMensagemString = JsonConvert.DeserializeObject<LambdaRequestMessage>(mensagemRequest);
-            }
-
-
-            RetiradaAgendadaEvent request = new RetiradaAgendadaEvent();
+            BaseMessage request = new RetiradaAgendadaEvent();
             request.TypeMsg = request.GetType().AssemblyQualifiedName;
             request.IdMsr = Guid.Parse(idMensagemString.Parametros.querystring.msgid);
             request.Email = "mica.msr@gmail.com";
-                        
-            await _sagaDynamoRepository.IncluirMensagemAgendamento(request);
-            
-            var mensagem = _sagaDynamoRepository.BuscarMensagemAgendamento<RetiradaAgendadaEvent>(idMensagemString.Parametros.querystring.msgid);
 
-            if(mensagem!=null)
+            await _sagaDynamoRepository.IncluirMensagemAgendamento(request);
+
+            var mensagem = await _sagaDynamoRepository.BuscarMensagemAgendamento<BaseMessage>(idMensagemString.Parametros.querystring.msgid);
+
+            if (mensagem != null)
             {
                 string messagestring = JsonConvert.SerializeObject(mensagem);
 

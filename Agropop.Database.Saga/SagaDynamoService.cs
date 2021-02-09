@@ -18,7 +18,7 @@ namespace Agropop.Database.Saga
             _client = client;            
         }
 
-        public async Task<T> BuscarMensagemAgendamento<T>(string msgId) where T : BaseMessage
+        public async Task<SagaMessageTable> BuscarMensagemAgendamento<T>(string msgId) where T : BaseMessage
         {
             DynamoDBContext context = new DynamoDBContext(_client);
 
@@ -35,13 +35,13 @@ namespace Agropop.Database.Saga
         }
 
 
-        private async Task<T> GetSagaMessage<T>(DynamoDBContext context, string msgId) where T : BaseMessage
+        private async Task<SagaMessageTable> GetSagaMessage<T>(DynamoDBContext context, string msgId) where T : BaseMessage
         {
             SagaMessageTable sagaItem = await context.LoadAsync<SagaMessageTable>(msgId).ConfigureAwait(false);
 
-            dynamic retorno = JsonConvert.DeserializeObject<T>(sagaItem.Message);
+           // dynamic retorno = JsonConvert.DeserializeObject<T>(sagaItem.Message);
 
-            return retorno;
+            return sagaItem;
         }
 
         private async Task<bool> PutSagaMessage<T>(DynamoDBContext context, T msg) where T : BaseMessage
@@ -50,8 +50,8 @@ namespace Agropop.Database.Saga
             SagaMessageTable sampleTableItems = new SagaMessageTable
             {
                 IdMsg = msg.IdMsr.ToString(),
-                TypeMessage = msg.TypeMsg,
-                Message = JsonConvert.SerializeObject(msg)
+              //  TypeMessage = msg.TypeMsg,
+             //   Message = JsonConvert.SerializeObject(msg)
             };
 
             var batchWrite = context.CreateBatchWrite<SagaMessageTable>();
