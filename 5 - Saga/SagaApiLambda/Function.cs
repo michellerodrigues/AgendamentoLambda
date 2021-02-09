@@ -64,8 +64,8 @@ namespace SagaApiLambda
             request.TypeMsg = request.GetType().AssemblyQualifiedName;
             request.IdMsr = Guid.Parse(idMensagemString.Parametros.querystring.msgid);
             request.Email = "mica.msr@gmail.com";
-
-            await _sagaDynamoRepository.IncluirMensagemAgendamento(request, request.IdMsr.ToString());
+                        
+            await _sagaDynamoRepository.IncluirMensagemAgendamento(request);
             
             var mensagem = _sagaDynamoRepository.BuscarMensagemAgendamento(idMensagemString.Parametros.querystring.msgid);
 

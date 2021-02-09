@@ -3,19 +3,14 @@ using System;
 
 namespace Agropop.Database.Saga.Tables
 {
-    [DynamoDBTable("AgroPopSagaColletion")]
+    [DynamoDBTable("AgroPopSagaCollection")]
     public class SagaMessageTable
     {
         [DynamoDBHashKey] //Partition key
-        public string Id
+        public string IdMsr
         {
             get; set;
-        }
+        }      
         
-        // Properties included implicitly.
-        public Object BodyMessage
-        {
-            get; set;
-        }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Agropop.Database.DataContext;
 using Agropop.Database.Saga;
+using Amazon;
 using Amazon.DynamoDBv2;
 using Amazon.Runtime;
 using EmailHelper;
@@ -82,7 +83,7 @@ namespace Saga.Dependency.DI
 
             services.AddSingleton(config);
 
-            services.AddSingleton(new AmazonDynamoDBClient(config.AccessKey, config.SecretKey));
+            services.AddSingleton(new AmazonDynamoDBClient(RegionEndpoint.SAEast1));
 
             services.AddScoped<ISagaDynamoRepository, SagaDynamoRepository>();
         }
