@@ -88,7 +88,7 @@ namespace AgendaLambda
         public async Task<string> HandleSagaMessage(AgendarRetiradaCommand request)
         {
             //salvar mensagem no dynamo
-            await _sagaDynamoRepository.IncluirMensagemAgendamento(request, request.IdMsr.ToString());
+            await _sagaDynamoRepository.IncluirMensagemAgendamento(request);
 
             await _emailService.Enviar(request.Email, $"Retirada Pendendente Lote {request.IdMsr}", String.Format("Http://api-saga-gateway/api/agendarRetiradaCommand?idMsr={0}",request.IdMsr));
             //enviar mensagem para o tópico e evento

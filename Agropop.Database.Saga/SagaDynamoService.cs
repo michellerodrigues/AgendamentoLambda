@@ -2,6 +2,7 @@
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DataModel;
 using Descarte.Messages;
+using Newtonsoft.Json;
 using System.Threading.Tasks;
 
 namespace Agropop.Database.Saga
@@ -17,16 +18,16 @@ namespace Agropop.Database.Saga
             _client = client;            
         }
 
-        public async Task<BaseMessage> BuscarMensagemAgendamento(string msgId)
+        public async Task<T> BuscarMensagemAgendamento<T>(string msgId) where T : BaseMessage
         {
             DynamoDBContext context = new DynamoDBContext(_client);
 
-            var retorno = await GetSagaMessage(context, msgId);
+            var retorno = await GetSagaMessage<T>(context, msgId);
 
             return retorno;
         }
 
-        public async Task<bool> IncluirMensagemAgendamento(BaseMessage msg)
+        public async Task<bool> IncluirMensagemAgendamento<T>(T msg) where T : BaseMessage
         {
             DynamoDBContext context = new DynamoDBContext(_client);
                         
@@ -34,24 +35,28 @@ namespace Agropop.Database.Saga
         }
 
 
-        private async Task<BaseMessage> GetSagaMessage(DynamoDBContext context, string msgId)
+        private async Task<T> GetSagaMessage<T>(DynamoDBContext context, string msgId) where T : BaseMessage
         {
-            BaseMessage sagaItem = await context.LoadAsync<BaseMessage>(msgId).ConfigureAwait(false);
+            SagaMessageTable sagaItem = await context.LoadAsync<SagaMessageTable>(msgId).ConfigureAwait(false);
 
-            return sagaItem;
+            dynamic retorno = JsonConvert.DeserializeObject<T>(sagaItem.Message);
+
+            return retorno;
         }
 
-        private async Task<bool> PutSagaMessage(DynamoDBContext context, BaseMessage msg)
+        private async Task<bool> PutSagaMessage<T>(DynamoDBContext context, T msg) where T : BaseMessage
         {
-            
-            //SagaMessageTable sampleTableItems = new SagaMessageTable
-            //{
-            //    IdMsr = msgId
-            //};
 
-            var batchWrite = context.CreateBatchWrite<BaseMessage>();
+            SagaMessageTable sampleTableItems = new SagaMessageTable
+            {
+                IdMsr = msg.IdMsr.ToString(),
+                TypeMessage = msg.TypeMsg,
+                Message = JsonConvert.SerializeObject(msg)
+            };
 
-            batchWrite.AddPutItem(msg);
+            var batchWrite = context.CreateBatchWrite<SagaMessageTable>();
+
+            batchWrite.AddPutItem(sampleTableItems);
 
             return true;
         }

@@ -67,7 +67,7 @@ namespace SagaApiLambda
                         
             await _sagaDynamoRepository.IncluirMensagemAgendamento(request);
             
-            var mensagem = _sagaDynamoRepository.BuscarMensagemAgendamento(idMensagemString.Parametros.querystring.msgid);
+            var mensagem = _sagaDynamoRepository.BuscarMensagemAgendamento<RetiradaAgendadaEvent>(idMensagemString.Parametros.querystring.msgid);
 
             if(mensagem!=null)
             {
