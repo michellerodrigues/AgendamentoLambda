@@ -49,7 +49,7 @@ namespace Agropop.Database.Saga
 
             SagaMessageTable sampleTableItems = new SagaMessageTable
             {
-                IdMsr = msg.IdMsr.ToString(),
+                IdMsg = msg.IdMsr.ToString(),
                 TypeMessage = msg.TypeMsg,
                 Message = JsonConvert.SerializeObject(msg)
             };

@@ -6,8 +6,8 @@ namespace Agropop.Database.Saga.Tables
     [DynamoDBTable("AgroPopSagaCollection")]
     public class SagaMessageTable
     {
-        [DynamoDBHashKey] //Partition key
-        public string IdMsr
+        [DynamoDBHashKey("Id")]
+        public string IdMsg
         {
             get; set;
         }
