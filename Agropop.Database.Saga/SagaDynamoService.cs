@@ -18,24 +18,23 @@ namespace Agropop.Database.Saga
             _client = client;            
         }
 
-        public async Task<SagaMessageTable> BuscarMensagemAgendamento<T>(string msgId) where T : BaseMessage
+        public async Task<T> BuscarMensagemAgendamento<T>(string msgId) where T : SagaMessageTable
         {
             DynamoDBContext context = new DynamoDBContext(_client);
 
             var retorno = await GetSagaMessage<T>(context, msgId);
 
-            return retorno;
+            return retorno as T;
         }
 
-        public async Task<bool> IncluirMensagemAgendamento<T>(T msg) where T : BaseMessage
+        public async Task<bool> IncluirMensagemAgendamento<T>(T msg) where T : SagaMessageTable
         {
             DynamoDBContext context = new DynamoDBContext(_client);
                         
-            return await PutSagaMessage(context, msg);
+            return await PutSagaMessage<T>(context, msg);
         }
-
-
-        private async Task<SagaMessageTable> GetSagaMessage<T>(DynamoDBContext context, string msgId) where T : BaseMessage
+        
+        private async Task<SagaMessageTable> GetSagaMessage<T>(DynamoDBContext context, string msgId) where T : SagaMessageTable
         {
             SagaMessageTable sagaItem = await context.LoadAsync<SagaMessageTable>(msgId).ConfigureAwait(false);
 
@@ -44,20 +43,19 @@ namespace Agropop.Database.Saga
             return sagaItem;
         }
 
-        private async Task<bool> PutSagaMessage<T>(DynamoDBContext context, T msg) where T : BaseMessage
+        private async Task<bool> PutSagaMessage<T>(DynamoDBContext context, T msg) where T : SagaMessageTable
         {
 
             SagaMessageTable sampleTableItems = new SagaMessageTable
             {
-                IdMsg = msg.IdMsr.ToString(),
-              //  TypeMessage = msg.TypeMsg,
-             //   Message = JsonConvert.SerializeObject(msg)
+                IdMsg = msg.IdMsg.ToString(),
             };
 
             var batchWrite = context.CreateBatchWrite<SagaMessageTable>();
 
             batchWrite.AddPutItem(sampleTableItems);
-
+            await batchWrite.ExecuteAsync();
+            
             return true;
         }
     }

@@ -44,7 +44,7 @@ namespace EmailHelper
                 mail.From = _mailAddress;
                 mail.To.Add(remetente);
                 mail.Subject = String.Format("AgroPop informa: {0}", assunto);
-
+                
                 mail.Body = mensagem;
 
                 mail.IsBodyHtml = true;

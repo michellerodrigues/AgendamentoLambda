@@ -1,4 +1,5 @@
 using Agropop.Database.Saga;
+using Agropop.Database.Saga.Tables;
 using Amazon.Lambda.APIGatewayEvents;
 using Amazon.Lambda.Core;
 using Amazon.SimpleNotificationService;
@@ -64,9 +65,9 @@ namespace SagaApiLambda
         //    request.TypeMsg = request.GetType().AssemblyQualifiedName;
         //    request.IdMsr = Guid.Parse(idMensagemString.Parametros.querystring.msgid);
         //    request.Email = "mica.msr@gmail.com";
-                        
+
         //    await _sagaDynamoRepository.IncluirMensagemAgendamento(request);
-            
+
         //    var mensagem = _sagaDynamoRepository.BuscarMensagemAgendamento<BaseMessage>(idMensagemString.Parametros.querystring.msgid);
 
         //    if(mensagem!=null)
@@ -96,19 +97,27 @@ namespace SagaApiLambda
         {
             string topicArn = "arn:aws:sns:sa-east-1:428672449531:DescarteSagaTopic";
 
-            BaseMessage request = new RetiradaAgendadaEvent();
-            request.TypeMsg = request.GetType().AssemblyQualifiedName;
-            request.IdMsr = Guid.Parse(idMensagemString.Parametros.querystring.msgid);
-            request.Email = "mica.msr@gmail.com";
+            BaseMessage requestx = new RetiradaAgendadaEvent();
+            requestx.TypeMsg = requestx.GetType().AssemblyQualifiedName;
+            requestx.IdMsr = Guid.Parse(idMensagemString.Parametros.querystring.msgid);
+            requestx.Email = "mica.msr@gmail.com";
+
+            SagaMessageTable request = new SagaMessageTable()
+            {
+                IdMsg = idMensagemString.Parametros.querystring.msgid,
+                Msg = JsonConvert.SerializeObject(requestx),
+                TypeMsg = requestx.GetType().AssemblyQualifiedName
+            };
 
             await _sagaDynamoRepository.IncluirMensagemAgendamento(request);
 
-            var mensagem = await _sagaDynamoRepository.BuscarMensagemAgendamento<BaseMessage>(idMensagemString.Parametros.querystring.msgid);
+            var mensagem = await _sagaDynamoRepository.BuscarMensagemAgendamento<SagaMessageTable>(idMensagemString.Parametros.querystring.msgid);
 
             if (mensagem != null)
             {
-                string messagestring = JsonConvert.SerializeObject(mensagem);
+                string messagestring = JsonConvert.SerializeObject(mensagem.Msg);
 
+                //acrescentar desserialize dinamico
                 RetiradaAgendadaEvent message = JsonConvert.DeserializeObject<RetiradaAgendadaEvent>(messagestring);
 
                 Dictionary<string, MessageAttributeValue> attributos = new Dictionary<string, MessageAttributeValue>();
@@ -120,7 +129,7 @@ namespace SagaApiLambda
                 };
                 attributos.Add("typeMsg", values);
 
-                //  _emailService.Enviar(message.Email, $"Retirada Agendada Lote {message.IdMsr}", String.Format("Http://api-saga-gateway/api/agendarRetiradaCommand?idMsr={0}", idMensagemString.Parametros.querystring.msgid));
+                  _emailService.Enviar(message.Email, $"Retirada Agendada Lote {message.IdMsr}", String.Format("Http://api-saga-gateway/api/agendarRetiradaCommand?idMsr={0}", idMensagemString.Parametros.querystring.msgid));
 
                 ProcessRecordAsync(topicArn, JsonConvert.SerializeObject(message), attributos).ConfigureAwait(false).GetAwaiter().GetResult();
             }

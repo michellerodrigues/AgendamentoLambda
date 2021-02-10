@@ -8,7 +8,7 @@ namespace Agropop.Database.Saga
 {
     public interface ISagaDynamoRepository
     {
-        public Task<SagaMessageTable> BuscarMensagemAgendamento<T>(string msgId) where T : BaseMessage;
-        public Task<bool> IncluirMensagemAgendamento<T>(T msg) where T : BaseMessage;
+        public Task<T> BuscarMensagemAgendamento<T>(string msgId) where T : SagaMessageTable;
+        public Task<bool> IncluirMensagemAgendamento<T>(T msg) where T : SagaMessageTable;
     }
 }

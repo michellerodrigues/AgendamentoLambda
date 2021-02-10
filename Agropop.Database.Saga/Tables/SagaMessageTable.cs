@@ -10,6 +10,19 @@ namespace Agropop.Database.Saga.Tables
         public string IdMsg
         {
             get; set;
-        }        
+        }
+
+        [DynamoDBProperty(AttributeName = "Msg")]
+        public string Msg
+        {
+            get; set;
+        }
+
+        [DynamoDBProperty(AttributeName = "TypeMsg")]
+        public string TypeMsg
+        {
+            get; set;
+        }
+
     }
 }
