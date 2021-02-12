@@ -97,7 +97,7 @@ namespace SagaApiLambda
         {
             string topicArn = "arn:aws:sns:sa-east-1:428672449531:DescarteSagaTopic";
 
-            BaseMessage requestx = new RetiradaAgendadaEvent();
+            RetiradaAgendadaEvent requestx = new RetiradaAgendadaEvent();
             requestx.TypeMsg = requestx.GetType().AssemblyQualifiedName;
             requestx.IdMsr = Guid.Parse(idMensagemString.Parametros.querystring.msgid);
             requestx.Email = "mica.msr@gmail.com";
@@ -115,10 +115,8 @@ namespace SagaApiLambda
 
             if (mensagem != null)
             {
-                string messagestring = JsonConvert.SerializeObject(mensagem.Msg);
-
                 //acrescentar desserialize dinamico
-                RetiradaAgendadaEvent message = JsonConvert.DeserializeObject<RetiradaAgendadaEvent>(messagestring);
+                RetiradaAgendadaEvent message = JsonConvert.DeserializeObject<RetiradaAgendadaEvent>(mensagem.Msg);
 
                 Dictionary<string, MessageAttributeValue> attributos = new Dictionary<string, MessageAttributeValue>();
 
@@ -129,7 +127,7 @@ namespace SagaApiLambda
                 };
                 attributos.Add("typeMsg", values);
 
-                  _emailService.Enviar(message.Email, $"Retirada Agendada Lote {message.IdMsr}", String.Format("Http://api-saga-gateway/api/agendarRetiradaCommand?idMsr={0}", idMensagemString.Parametros.querystring.msgid));
+                await _emailService.Enviar(message.Email, $"Retirada Agendada Lote {message.IdMsr}", String.Format("Http://api-saga-gateway/api/agendarRetiradaCommand?idMsr={0}", idMensagemString.Parametros.querystring.msgid));
 
                 ProcessRecordAsync(topicArn, JsonConvert.SerializeObject(message), attributos).ConfigureAwait(false).GetAwaiter().GetResult();
             }

@@ -49,6 +49,8 @@ namespace Agropop.Database.Saga
             SagaMessageTable sampleTableItems = new SagaMessageTable
             {
                 IdMsg = msg.IdMsg.ToString(),
+                Msg = msg.Msg,
+                TypeMsg = msg.TypeMsg
             };
 
             var batchWrite = context.CreateBatchWrite<SagaMessageTable>();
