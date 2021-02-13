@@ -17,7 +17,7 @@
     <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="3.3.101" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\6 - Helpers\EmailHelper\EmailHelper.csproj" />
+    <ProjectReference Include="..\6 - Helpers\EmailHelper\Agropop.Email.Helper.csproj" />
     <ProjectReference Include="..\Agropop.Database.Saga\Agropop.Database.Saga.csproj" />
     <ProjectReference Include="..\Agropop.Database\Agropop.Database.Descarte.csproj" />
   </ItemGroup>

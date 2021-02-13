@@ -45,7 +45,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SagaLambda.Tests", "SagaLam
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "6 - Helpers", "6 - Helpers", "{A0B4A7B1-4F02-464D-BBB5-261649F2D68B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EmailHelper", "6 - Helpers\EmailHelper\EmailHelper.csproj", "{B35C497A-2989-447B-8B02-E8AF79E06FD5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Agropop.Email.Helper", "6 - Helpers\EmailHelper\Agropop.Email.Helper.csproj", "{B35C497A-2989-447B-8B02-E8AF79E06FD5}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Agropop.Dependency.Inject", "Agropop.Dependency.Inject\Agropop.Dependency.Inject.csproj", "{C26B5EB5-E8B7-4B04-9570-C74E0B511692}"
 EndProject
@@ -58,6 +58,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SagaApiLambda", "5 - Saga\SagaApiLambda\SagaApiLambda.csproj", "{5AFA58F1-FD42-4E71-8868-3295B5AB10F6}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SagaApiLambda.Tests", "5 - Saga\SagaApiLambda.Tests\SagaApiLambda.Tests.csproj", "{1CEDB83F-9AA7-49F9-88E0-6B335E9A692C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Agropop.AwsServices.Helper", "Agropop.AwsServices.Helper\Agropop.AwsServices.Helper.csproj", "{434DF2D5-343A-4370-9397-7B5BA1FAA0C6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -133,6 +135,10 @@ Global
 		{1CEDB83F-9AA7-49F9-88E0-6B335E9A692C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1CEDB83F-9AA7-49F9-88E0-6B335E9A692C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1CEDB83F-9AA7-49F9-88E0-6B335E9A692C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{434DF2D5-343A-4370-9397-7B5BA1FAA0C6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{434DF2D5-343A-4370-9397-7B5BA1FAA0C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{434DF2D5-343A-4370-9397-7B5BA1FAA0C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{434DF2D5-343A-4370-9397-7B5BA1FAA0C6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -155,6 +161,7 @@ Global
 		{9E69C45F-EFF4-4DC6-85FE-62146E5D9EBE} = {78EE87D1-6CB6-474B-865E-2FB33F0DD5B2}
 		{5AFA58F1-FD42-4E71-8868-3295B5AB10F6} = {2DE60226-1894-4A41-AD4C-82D48E11A371}
 		{1CEDB83F-9AA7-49F9-88E0-6B335E9A692C} = {2DE60226-1894-4A41-AD4C-82D48E11A371}
+		{434DF2D5-343A-4370-9397-7B5BA1FAA0C6} = {A0B4A7B1-4F02-464D-BBB5-261649F2D68B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C54D2F21-028B-4827-BF22-84033316877A}

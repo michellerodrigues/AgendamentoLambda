@@ -1,5 +1,7 @@
+using Agropop.AwsServices.Helper;
 using Agropop.Database.DataContext;
 using Agropop.Database.Saga;
+using Agropop.Database.Saga.Tables;
 using Amazon.Lambda.Core;
 using Amazon.Lambda.SQSEvents;
 using Amazon.SQS;
@@ -23,6 +25,7 @@ namespace AgendaLambda
         //public AppSettings AppSettings { get; }
         private readonly IEmailService _emailService;
         private readonly ISagaDynamoRepository _sagaDynamoRepository;
+        private readonly string _topicArn;
         /// <summary>
         /// Default constructor. This constructor is used by Lambda to construct the instance. When invoked in a Lambda environment
         /// the AWS credentials will come from the IAM role associated with the function and the AWS region will be set to the
@@ -33,6 +36,7 @@ namespace AgendaLambda
             var resolver = new DependencyResolver();
             _emailService = resolver.GetService<IEmailService>();
             _sagaDynamoRepository = resolver.GetService<ISagaDynamoRepository>();
+            _topicArn = "arn:aws:sns:sa-east-1:428672449531:DescarteSagaTopic";
         }
 
 
@@ -85,34 +89,47 @@ namespace AgendaLambda
             dynamic instance = Activator.CreateInstance(tipo, false);
             await HandleSagaMessage(instance);
         }
-        public async Task<string> HandleSagaMessage(AgendarRetiradaCommand request)
-        {
-            //salvar mensagem no dynamo
-            await _sagaDynamoRepository.IncluirMensagemAgendamento(request);
 
-            await _emailService.Enviar(request.Email, $"Retirada Pendendente Lote {request.IdMsr}", String.Format("Http://api-saga-gateway/api/agendarRetiradaCommand?idMsr={0}",request.IdMsr));
-            //enviar mensagem para o tópico e evento
-            //quando receber o evento, enviar o email e mandar para o topico outro evento para a triagem
-            //enviar o email para o cidadão
-            return "AgendarRetiradaCommand ok";
+        public async Task HandleSagaMessage(LotesVencidosVerificadosEvent request)
+        {
+            AgendarRetiradaCommand agendar = new AgendarRetiradaCommand()
+            {
+                DataRetirada = DateTime.Now.AddDays(7), //RN
+                DateMsg = DateTime.Now,
+                Email = request.Email,
+                IdMsr = request.IdMsr,
+                Lote = request.Lote,
+            };
+
+            agendar.TypeMsg = agendar.GetType().AssemblyQualifiedName;
+
+            await AWSServices.EnviarMensgemTopico(JsonConvert.SerializeObject(agendar), agendar.TypeMsg, _topicArn);
         }
 
-        public async Task<string> HandleSagaMessage(RetiradaAgendadaEvent request)
+        public async Task HandleSagaMessage(AgendarRetiradaCommand request)
         {
 
-            await _emailService.Enviar(request.Email, $"Retirada Agendada Lote {request.IdMsr}", String.Format("Http://api-saga-gateway/api/agendarRetiradaCommand?idMsr={0}", request.IdMsr));
+            SagaMessageTable objDynamo = new SagaMessageTable()
+            {
+                IdMsg = request.IdMsr.ToString(),
+                Msg = JsonConvert.SerializeObject(request),
+                TypeMsg = request.GetType().AssemblyQualifiedName
+            };
 
+            await _sagaDynamoRepository.IncluirMensagemAgendamento(objDynamo);
 
-            //var obj = await _sagaDynamoRepository.BuscarMensagemAgendamento( request.IdMsr.ToString()).ConfigureAwait(false);
+            await _emailService.Enviar(request.Email, $"Retirada Agendada Lote {request.IdMsr}", String.Format("https://aobgkj4vt5.execute-api.sa-east-1.amazonaws.com/v1/agendar?msgid={0}", request.IdMsr));
+            
+            //publicar event
+        }
 
-            //string agendamentoString = JsonConvert.SerializeObject(obj);
+       
 
-            //AgendarRetiradaCommand agendarRetiradaCommand = JsonConvert.DeserializeObject<AgendarRetiradaCommand>(agendamentoString);
-            ////quando  o cidadão clicar no e-mail, uma mensagem será colocada na fila RetiradaAgendadaEvent e irá cair aqui
-            ////enviar mensagem para o tópico e evento
-            ////quando receber o evento, enviar o email e mandar para o topico outro evento para a triagem
+        public async Task HandleSagaMessage(ConfirmarAgendamentoRetiradaCommand request)
+        {
+            await _emailService.Enviar(request.Email, $"Retirada Confirmada Lote {request.IdMsr}. Em caso de Cancelamento", String.Format("https://aobgkj4vt5.execute-api.sa-east-1.amazonaws.com/v1/cancelar?msgid={0}", request.IdMsr));
 
-            return "RetiradaAgendadaEvent ok";
+            //publicar event
         }
 
     }
