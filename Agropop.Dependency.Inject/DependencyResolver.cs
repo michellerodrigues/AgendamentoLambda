@@ -1,4 +1,7 @@
 ﻿using Agropop.Database.DataContext;
+using Agropop.Database.Interfaces;
+using Agropop.Database.Models;
+using Agropop.Database.Repository;
 using Agropop.Database.Saga;
 using Amazon;
 using Amazon.DynamoDBv2;
@@ -45,10 +48,12 @@ namespace Saga.Dependency.DI
             var descarteContext = ConfigureDescarteDataContext(appSettings);
 
             services.AddSingleton(descarteContext);
+            
+            services.AddScoped<IEstoqueRepository, EstoqueRepository>();
 
            // services.AddDbContext<DbContext>(ServiceLifetime.Scoped);
 
-           AddEmailService(services, configuration);
+            AddEmailService(services, configuration);
             services.AddTransient<IEnvironmentService, EnvironmentService>();
            AddDynamoDBService(services, configuration);
             // Register other services

@@ -39,49 +39,6 @@ namespace AgendaLambda
             _topicArn = "arn:aws:sns:sa-east-1:428672449531:descarte-saga-topic-sns";
         }
 
-
-        /// <summary>
-        /// This method is called for every Lambda invocation. This method takes in an SQS event object and can be used 
-        /// to respond to SQS messages.
-        /// </summary>
-        /// <param name="evnt"></param>
-        /// <param name="context"></param>
-        /// <returns></returns>
-        //public async Task FunctionHandler(SQSEvent evnt, ILambdaContext context)
-        //{
-        //    foreach (var message in evnt.Records)
-        //    {
-        //        await ProcessMessageAsync(message, context);
-        //    }
-        //}
-
-        //private async Task ProcessMessageAsync(SQSEvent.SQSMessage message, ILambdaContext context)
-        //{
-        //    context.Logger.LogLine($"Processed message '{message.Body}'");
-
-        //    // TODO: Do interesting work based on the new message
-
-        //    var client = new AmazonSQSClient();
-        //    string topic = "https://sqs.sa-east-1.amazonaws.com/428672449531/agendamento_events_sqs";
-
-        //    RetiradaAgendadaEvent evento = new RetiradaAgendadaEvent()
-        //    {
-        //        DateMsg = DateTime.Now,
-        //        ReceivedMessage = message.Body
-        //    };
-
-        //    await client.SendMessageAsync(topic, JsonConvert.SerializeObject(evento)).ConfigureAwait(false);
-
-        //    await Task.CompletedTask;
-        //}
-
-        ///// <summary>
-        ///// A simple function that takes a string and does a ToUpper
-        ///// </summary>
-        ///// <param name="input"></param>
-        ///// <param name="context"></param>
-        ///// <returns></returns>
-        ////public async Task FunctionHandler(SQSEvent.SQSMessage message, ILambdaContext context)
         public async Task FunctionHandler(SQSEvent sqsEvent, ILambdaContext context)
         {
             foreach (var message in sqsEvent.Records)

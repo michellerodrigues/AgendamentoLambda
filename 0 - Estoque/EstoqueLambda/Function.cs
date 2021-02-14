@@ -54,7 +54,7 @@ namespace EstoqueLambda
                 BaseMessage baseMsg = JsonConvert.DeserializeObject<BaseMessage>(message.Body);
                 Type tipo = Type.GetType(baseMsg.TypeMsg);
                 dynamic instance = Activator.CreateInstance(tipo, false);
-                await HandleSagaMessage(instance, baseMsg.TypeMsg);
+                await HandleSagaMessage(instance, message.Body);
             }
         }
 
