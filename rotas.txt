@@ -1,0 +1,43 @@
+
+saga-dl-queue-sqs
+estoque-queue-sqs
+{
+  "typeMsg": [
+    "Descarte.Messages.Command.VerificarLotesVencidosCommand, Descarte.Messages, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
+    "Descarte.Messages.Command.DescartarLoteEstoqueCommand, Descarte.Messages, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"
+  ]
+}
+
+agenda-queue-sqs
+{
+  "typeMsg": [
+    "Descarte.Messages.Command.LotesVencidosVerificadosEvent, Descarte.Messages, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
+    "Descarte.Messages.Command.AgendarRetiradaCommand, Descarte.Messages, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
+	"Descarte.Messages.Command.ConfirmarAgendamentoRetiradaCommand, Descarte.Messages, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"
+  ]
+}
+
+triagem-queue-sqs
+{
+  "typeMsg": [
+    "Descarte.Messages.Command.AgendamentoRetiradaConfirmadoEvent, Descarte.Messages, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
+    "Descarte.Messages.Command.RealizarTriagemCommand, Descarte.Messages, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"
+  ]
+}
+
+descarte-queue-sqs
+{
+  "typeMsg": [
+    "Descarte.Messages.Command.TriagemRealizadaEvent, Descarte.Messages, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
+    "Descarte.Messages.Command.LoteDescartadoEvent, Descarte.Messages, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"
+  ]
+}
+
+{
+  "Email": "mica.msr@gmail.com",
+  "Lote": "9bd89eeb-ee99-4f46-b461-93b9b495eeb9",
+  "IdMsr": "41b02429-ad8b-4493-8656-31f0fbea51a3",
+  "DataRetirada": "2021-03-03T12:27:40.150953-03:00",
+  "DateMsg": "2021-02-14T08:53:00.150953-03:00",
+  "TypeMsg": "Descarte.Messages.Command.AgendamentoRetiradaConfirmadoEvent, Descarte.Messages, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"
+}

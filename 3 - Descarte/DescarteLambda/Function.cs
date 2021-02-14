@@ -41,7 +41,7 @@ namespace DescarteLambda
             _sagaDynamoRepository = resolver.GetService<ISagaDynamoRepository>();
             _estoqueRepository = resolver.GetService<IEstoqueRepository>();
             _emailService = resolver.GetService<IEmailService>();
-            _topicArn = "arn:aws:sns:sa-east-1:428672449531:saga-descarte-topic-sns.fifo";
+            _topicArn = "arn:aws:sns:sa-east-1:428672449531:saga-descarte-topic-sns";
         }
         /// <summary>
         /// A simple function that takes a string and does a ToUpper

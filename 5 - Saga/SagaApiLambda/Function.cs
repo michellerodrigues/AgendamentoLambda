@@ -39,7 +39,7 @@ namespace SagaApiLambda
             var resolver = new DependencyResolver();
             _emailService = resolver.GetService<IEmailService>();
             _sagaDynamoRepository = resolver.GetService<ISagaDynamoRepository>();
-            _topicArn = "arn:aws:sns:sa-east-1:428672449531:saga-descarte-topic-sns.fifo";
+            _topicArn = "arn:aws:sns:sa-east-1:428672449531:saga-descarte-topic-sns";
         }
 
 
