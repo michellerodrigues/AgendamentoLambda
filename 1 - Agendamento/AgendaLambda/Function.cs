@@ -36,7 +36,7 @@ namespace AgendaLambda
             var resolver = new DependencyResolver();
             _emailService = resolver.GetService<IEmailService>();
             _sagaDynamoRepository = resolver.GetService<ISagaDynamoRepository>();
-            _topicArn = "arn:aws:sns:sa-east-1:428672449531:DescarteSagaTopic";
+            _topicArn = "arn:aws:sns:sa-east-1:428672449531:saga-descarte-topic-sns.fifo";
         }
 
 
@@ -82,12 +82,15 @@ namespace AgendaLambda
         ///// <param name="context"></param>
         ///// <returns></returns>
         ////public async Task FunctionHandler(SQSEvent.SQSMessage message, ILambdaContext context)
-        public async Task FunctionHandler(SQSEvent.SQSMessage message, ILambdaContext context)
+        public async Task FunctionHandler(SQSEvent sqsEvent, ILambdaContext context)
         {
-            BaseMessage baseMsg = JsonConvert.DeserializeObject<BaseMessage>(message.Body);
-            Type tipo = Type.GetType(baseMsg.TypeMsg);
-            dynamic instance = Activator.CreateInstance(tipo, false);
-            await HandleSagaMessage(instance);
+            foreach (var message in sqsEvent.Records)
+            {
+                BaseMessage baseMsg = JsonConvert.DeserializeObject<BaseMessage>(message.Body);
+                Type tipo = Type.GetType(baseMsg.TypeMsg);
+                dynamic instance = Activator.CreateInstance(tipo, false);
+                await HandleSagaMessage(instance);
+            }
         }
 
         public async Task HandleSagaMessage(LotesVencidosVerificadosEvent request)
