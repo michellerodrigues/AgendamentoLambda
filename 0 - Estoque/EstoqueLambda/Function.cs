@@ -1,3 +1,4 @@
+using Agropop.AwsServices.Helper;
 using Agropop.Database.DataContext;
 using Agropop.Database.Interfaces;
 using Agropop.Database.Models;
@@ -6,6 +7,7 @@ using Amazon.Lambda.SQSEvents;
 using Amazon.SQS;
 using Descarte.Messages;
 using Descarte.Messages.Command;
+using Descarte.Messages.Event;
 using EmailHelper;
 using Newtonsoft.Json;
 using Saga.Dependency.DI;
@@ -27,6 +29,8 @@ namespace EstoqueLambda
 
         private readonly InitializeDbContext _initialize;
 
+        private readonly string _topicArn;
+
         public Function()
         {
             var resolver = new DependencyResolver();
@@ -34,6 +38,7 @@ namespace EstoqueLambda
             _emailService = resolver.GetService<IEmailService>();
             var context = resolver.GetService<DescarteDataContext>();
             _initialize = new InitializeDbContext(context);
+            _topicArn = "arn:aws:sns:sa-east-1:428672449531:DescarteSagaTopic";
         }
 
         /// <summary>
@@ -50,15 +55,6 @@ namespace EstoqueLambda
             dynamic instance = Activator.CreateInstance(tipo, false);
             HandleSagaMessage(instance);
         }
-
-        ////public async Task FunctionHandler(SQSEvent.SQSMessage message, ILambdaContext context)
-        //public async Task FunctionHandler(int i, ILambdaContext context)
-        //{
-        //    await _emailService.Enviar("mica.msr@gmail.com", "teste envio lambda", "oi, esta é uma mensagem com acento e quebra de linha \n");
-
-        //    await Task.CompletedTask;
-
-        //}
 
         public async Task<string> HandleSagaMessage(VerificarLotesVencidosCommand msg)
         {
@@ -92,27 +88,18 @@ namespace EstoqueLambda
             return $"Não existem lotes vencidos para descarte";
         }
 
-        public async Task<string> HandleSagaMessage(LotesVencidosVerificadosEvent msg)
+        public async Task HandleSagaMessage(DescartarLoteEstoqueCommand request)
         {
-            var lotesVencidos = (List<Estoque>)_estoqueRepository.AtualizarLotesEnviadosParaDescarte(msg.Lote);
+            //marcar no banco que o estoque foi descartado
+            await _emailService.Enviar(request.Email, $"Seu lote {request.Lote} foi descartado com sucesso", String.Format("https://aobgkj4vt5.execute-api.sa-east-1.amazonaws.com/v1/cancelar?msgid={0}", request.IdMsr));
 
-            var client = new AmazonSQSClient();
+            string requestString = JsonConvert.SerializeObject(request);
 
-            string queue = "https://sqs.sa-east-1.amazonaws.com/428672449531/agendamento";
+            //publicar event
+            var evento = JsonConvert.DeserializeObject<LoteDescartadoEvent>(requestString);
+            evento.TypeMsg = evento.GetType().AssemblyQualifiedName;
 
-            AgendarRetiradaCommand agendarRetirada = new AgendarRetiradaCommand()
-            {
-                DateMsg = System.DateTime.Now,
-                Email = msg.Email,
-                IdMsr = msg.IdMsr,
-                Lote = msg.Lote
-            };
-            agendarRetirada.TypeMsg = agendarRetirada.GetType().AssemblyQualifiedName;
-
-
-            var retorno = await client.SendMessageAsync(queue, JsonConvert.SerializeObject(agendarRetirada)).ConfigureAwait(false);
-
-            return retorno.MessageId;
+            await AWSServices.EnviarMensgemTopico(JsonConvert.SerializeObject(evento), evento.TypeMsg, _topicArn);
         }
     }
 }

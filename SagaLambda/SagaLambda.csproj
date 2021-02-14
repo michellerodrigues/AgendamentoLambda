@@ -17,5 +17,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Descarte.Messages\Descarte.Messages.csproj" />
+    <ProjectReference Include="..\Agropop.AwsServices.Helper\Agropop.AwsServices.Helper.csproj" />
   </ItemGroup>
 </Project>

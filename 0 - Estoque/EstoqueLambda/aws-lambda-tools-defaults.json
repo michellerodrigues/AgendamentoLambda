@@ -19,5 +19,6 @@
     "function-role"        : "arn:aws:iam::428672449531:role/service-role/FunctionMicaHandler-role-x153qswt",
     "tracing-mode"         : "PassThrough",
     "environment-variables" : "",
-    "image-tag"             : ""
+    "image-tag"             : "",
+    "function-description"  : ""
 }

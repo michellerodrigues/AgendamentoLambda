@@ -5,13 +5,18 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Agropop.AwsServices.Helper;
+using Agropop.Database.DataContext;
+using Agropop.Database.Interfaces;
 using Agropop.Database.Saga;
 using Amazon.Lambda.Core;
+using Amazon.Lambda.SQSEvents;
 using Amazon.SimpleNotificationService;
 using Amazon.SimpleNotificationService.Model;
 using Descarte.Messages;
 using Descarte.Messages.Command;
 using Descarte.Messages.Event;
+using EmailHelper;
 using Newtonsoft.Json;
 using Saga.Dependency.DI;
 
@@ -25,11 +30,18 @@ namespace DescarteLambda
     public class Function
     {
         private readonly ISagaDynamoRepository _sagaDynamoRepository;
+        public AppSettings AppSettings { get; }
+        private readonly IEstoqueRepository _estoqueRepository;
+        private readonly IEmailService _emailService;
+        private readonly string _topicArn;
 
         public Function()
         {
             var resolver = new DependencyResolver();
             _sagaDynamoRepository = resolver.GetService<ISagaDynamoRepository>();
+            _estoqueRepository = resolver.GetService<IEstoqueRepository>();
+            _emailService = resolver.GetService<IEmailService>();
+            _topicArn = "arn:aws:sns:sa-east-1:428672449531:DescarteSagaTopic";
         }
         /// <summary>
         /// A simple function that takes a string and does a ToUpper
@@ -37,54 +49,38 @@ namespace DescarteLambda
         /// <param name="input"></param>
         /// <param name="context"></param>
         /// <returns></returns>
-        public async Task<string> FunctionHandler(string idMsg, ILambdaContext context)
+        public async Task FunctionHandler(SQSEvent.SQSMessage message, ILambdaContext context)
         {
 
-            //buscar id da mensagem no dynamo
+            BaseMessage baseMsg = JsonConvert.DeserializeObject<BaseMessage>(message.Body);
+            Type tipo = Type.GetType(baseMsg.TypeMsg);
+            dynamic instance = Activator.CreateInstance(tipo, false);
+            await HandleSagaMessage(instance);
 
-            string topicArn = "arn:aws:sns:sa-east-1:428672449531:DescarteSagaTopic";
-
-            RetiradaAgendadaEvent retiradaAgendadaEvent = new RetiradaAgendadaEvent()
-            {
-                IdMsr = Guid.Parse(idMsg),
-                Email = "mica.msr@gmail.com"
-            };
-            retiradaAgendadaEvent.TypeMsg = retiradaAgendadaEvent.GetType().AssemblyQualifiedName;
-
-
-            Dictionary<string, MessageAttributeValue> attributos = new Dictionary<string, MessageAttributeValue>();
-
-            byte[] byteArray = Encoding.UTF8.GetBytes(retiradaAgendadaEvent.GetType().AssemblyQualifiedName);
-
-            var stream = new MemoryStream(byteArray);
-            stream.Position = 0;
-
-            MessageAttributeValue attrib = new MessageAttributeValue()
-            {
-                StringValue = retiradaAgendadaEvent.GetType().AssemblyQualifiedName,
-                DataType = "String"
-            };
-
-            attributos.Add("typeMsg", attrib);
-
-            return await PublicarNoTopico(topicArn, JsonConvert.SerializeObject(retiradaAgendadaEvent), attributos);
         }
 
-        public async Task<string> PublicarNoTopico(string topicArn, string message, Dictionary<string, MessageAttributeValue> attributos)
+        public async Task HandleSagaMessage(TriagemRealizadaEvent request)
         {
-            var client = new AmazonSimpleNotificationServiceClient(region: Amazon.RegionEndpoint.SAEast1);
+            await _emailService.Enviar(request.Email, $"Seu lote {request.Lote} já pode ser retirado. Em caso de Cancelamento", String.Format("https://aobgkj4vt5.execute-api.sa-east-1.amazonaws.com/v1/cancelar?msgid={0}", request.IdMsr));
 
-            var request = new PublishRequest()
-            {
-                Message = message,
-                MessageAttributes = attributos,
-                TopicArn = topicArn
-            };
 
-            string teste = JsonConvert.SerializeObject(request);
-            await client.PublishAsync(request);
+            string requestString = JsonConvert.SerializeObject(request);
 
-            return $"mensagem publicada { teste}";
+            //publicar event
+            var evento = JsonConvert.DeserializeObject<DescartarLoteEstoqueCommand>(requestString);
+            evento.TypeMsg = evento.GetType().AssemblyQualifiedName;
+
+            await AWSServices.EnviarMensgemTopico(JsonConvert.SerializeObject(evento), evento.TypeMsg, _topicArn);
+        }
+
+        public async Task HandleSagaMessage(LoteDescartadoEvent request)
+        {
+            //marcar como descartado no banco de dados sql do estoque
+            string requestString = JsonConvert.SerializeObject(request);
+
+            await _emailService.Enviar(request.Email, $"Seu lote {request.Lote} foi entregue com sucesso. Obrigada por contribuir para a natureza", String.Format("https://aobgkj4vt5.execute-api.sa-east-1.amazonaws.com/v1/cancelar?msgid={0}", request.IdMsr));
+
+            //salvar no dynamo que está finalizado
         }
     }
 }
