@@ -38,7 +38,7 @@ namespace EstoqueLambda
             _emailService = resolver.GetService<IEmailService>();
             var context = resolver.GetService<DescarteDataContext>();
             _initialize = new InitializeDbContext(context);
-            _topicArn = "arn:aws:sns:sa-east-1:428672449531:saga-descarte-topic-sns";
+            _topicArn = "arn:aws:sns:sa-east-1:428672449531:descarte-saga-topic-sns";
         }
 
         /// <summary>
@@ -54,11 +54,11 @@ namespace EstoqueLambda
                 BaseMessage baseMsg = JsonConvert.DeserializeObject<BaseMessage>(message.Body);
                 Type tipo = Type.GetType(baseMsg.TypeMsg);
                 dynamic instance = Activator.CreateInstance(tipo, false);
-                await HandleSagaMessage(instance);
+                await HandleSagaMessage(instance, baseMsg.TypeMsg);
             }
         }
 
-        public async Task<string> HandleSagaMessage(VerificarLotesVencidosCommand msg)
+        public async Task<string> HandleSagaMessage(VerificarLotesVencidosCommand msg, string body)
         {
             var lotesVencidos = (List<Estoque>)_estoqueRepository.FindItensVencidosEstoque();
             var lotes = new List<LotesVencidosVerificadosEvent>();
@@ -90,8 +90,10 @@ namespace EstoqueLambda
             return $"Não existem lotes vencidos para descarte";
         }
 
-        public async Task HandleSagaMessage(DescartarLoteEstoqueCommand request)
+        public async Task HandleSagaMessage(DescartarLoteEstoqueCommand msg, string body)
         {
+            var request = JsonConvert.DeserializeObject<DescartarLoteEstoqueCommand>(body);
+
             //marcar no banco que o estoque foi descartado
             await _emailService.Enviar(request.Email, $"Seu lote {request.Lote} foi descartado com sucesso", String.Format("https://aobgkj4vt5.execute-api.sa-east-1.amazonaws.com/v1/cancelar?msgid={0}", request.IdMsr));
 

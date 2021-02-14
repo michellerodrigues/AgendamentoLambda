@@ -36,7 +36,7 @@ namespace AgendaLambda
             var resolver = new DependencyResolver();
             _emailService = resolver.GetService<IEmailService>();
             _sagaDynamoRepository = resolver.GetService<ISagaDynamoRepository>();
-            _topicArn = "arn:aws:sns:sa-east-1:428672449531:saga-descarte-topic-sns";
+            _topicArn = "arn:aws:sns:sa-east-1:428672449531:descarte-saga-topic-sns";
         }
 
 
@@ -87,14 +87,17 @@ namespace AgendaLambda
             foreach (var message in sqsEvent.Records)
             {
                 BaseMessage baseMsg = JsonConvert.DeserializeObject<BaseMessage>(message.Body);
+                baseMsg.BodyMsgQueue = message.Body;
                 Type tipo = Type.GetType(baseMsg.TypeMsg);
                 dynamic instance = Activator.CreateInstance(tipo, false);
-                await HandleSagaMessage(instance);
+                await HandleSagaMessage(instance, message.Body);
             }
         }
 
-        public async Task HandleSagaMessage(LotesVencidosVerificadosEvent request)
+        public async Task HandleSagaMessage(LotesVencidosVerificadosEvent evento, string body)
         {
+            var request = JsonConvert.DeserializeObject<LotesVencidosVerificadosEvent>(body);
+            
             AgendarRetiradaCommand agendar = new AgendarRetiradaCommand()
             {
                 DataRetirada = DateTime.Now.AddDays(7), //RN
@@ -109,8 +112,9 @@ namespace AgendaLambda
             await AWSServices.EnviarMensgemTopico(JsonConvert.SerializeObject(agendar), agendar.TypeMsg, _topicArn);
         }
 
-        public async Task HandleSagaMessage(AgendarRetiradaCommand request)
+        public async Task HandleSagaMessage(AgendarRetiradaCommand comando,string body)
         {
+            var request = JsonConvert.DeserializeObject<AgendarRetiradaCommand>(body);
 
             SagaMessageTable objDynamo = new SagaMessageTable()
             {
@@ -128,8 +132,11 @@ namespace AgendaLambda
 
        
 
-        public async Task HandleSagaMessage(ConfirmarAgendamentoRetiradaCommand request)
+        public async Task HandleSagaMessage(ConfirmarAgendamentoRetiradaCommand comando, string body)
         {
+
+            var request = JsonConvert.DeserializeObject<ConfirmarAgendamentoRetiradaCommand>(body);
+
             await _emailService.Enviar(request.Email, $"Retirada Confirmada Lote {request.IdMsr}. Em caso de Cancelamento", String.Format("https://aobgkj4vt5.execute-api.sa-east-1.amazonaws.com/v1/cancelar?msgid={0}", request.IdMsr));
 
 

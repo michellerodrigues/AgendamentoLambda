@@ -21,7 +21,7 @@ namespace SagaLambda
         private readonly string _topicArn;
         public Function()
         {
-            _topicArn = "arn:aws:sns:sa-east-1:428672449531:saga-descarte-topic-sns";
+            _topicArn = "arn:aws:sns:sa-east-1:428672449531:descarte-saga-topic-sns";
         }
 
 

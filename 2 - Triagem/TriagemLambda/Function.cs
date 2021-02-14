@@ -16,7 +16,7 @@ using Saga.Dependency.DI;
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.SystemTextJson.DefaultLambdaJsonSerializer))]
 
-namespace TriagemLambda
+namespace TriagemLambdadescarte-saga-topic-sns
 {
     public class Function
     {
@@ -25,7 +25,7 @@ namespace TriagemLambda
         private readonly string _topicArn;
         public Function()
         {
-            _topicArn = "arn:aws:sns:sa-east-1:428672449531:saga-descarte-topic-sns";
+            _topicArn = "arn:aws:sns:sa-east-1:428672449531:descarte-saga-topic-sns";
             var resolver = new DependencyResolver();
             _emailService = resolver.GetService<IEmailService>();
             _sagaDynamoRepository = resolver.GetService<ISagaDynamoRepository>();
@@ -44,13 +44,16 @@ namespace TriagemLambda
                 BaseMessage baseMsg = JsonConvert.DeserializeObject<BaseMessage>(message.Body);
                 Type tipo = Type.GetType(baseMsg.TypeMsg);
                 dynamic instance = Activator.CreateInstance(tipo, false);
-                await HandleSagaMessage(instance);
+                await HandleSagaMessage(instance, message.Body);
             }           
         }
 
 
-        public async Task HandleSagaMessage(AgendamentoRetiradaConfirmadoEvent request)
+        public async Task HandleSagaMessage(AgendamentoRetiradaConfirmadoEvent msg, string body)
         {
+            var request = JsonConvert.DeserializeObject<AgendamentoRetiradaConfirmadoEvent>(body); 
+           
+
             await _emailService.Enviar(request.Email, $"Seu lote {request.Lote} foi enviado para a Triagem. Em caso de Cancelamento", String.Format("https://aobgkj4vt5.execute-api.sa-east-1.amazonaws.com/v1/cancelar?msgid={0}", request.IdMsr));
 
 
@@ -63,8 +66,10 @@ namespace TriagemLambda
             await AWSServices.EnviarMensgemTopico(JsonConvert.SerializeObject(evento), evento.TypeMsg, _topicArn);
         }
 
-        public async Task HandleSagaMessage(RealizarTriagemCommand request)
+        public async Task HandleSagaMessage(RealizarTriagemCommand msg, string body)
         {
+            var request = JsonConvert.DeserializeObject<RealizarTriagemCommand>(body);
+
             await _emailService.Enviar(request.Email, $"Seu lote {request.Lote} está sendo preparado para descarte. Em caso de Cancelamento", String.Format("https://aobgkj4vt5.execute-api.sa-east-1.amazonaws.com/v1/cancelar?msgid={0}", request.IdMsr));
 
 

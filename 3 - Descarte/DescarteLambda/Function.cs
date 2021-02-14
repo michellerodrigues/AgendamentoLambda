@@ -41,7 +41,7 @@ namespace DescarteLambda
             _sagaDynamoRepository = resolver.GetService<ISagaDynamoRepository>();
             _estoqueRepository = resolver.GetService<IEstoqueRepository>();
             _emailService = resolver.GetService<IEmailService>();
-            _topicArn = "arn:aws:sns:sa-east-1:428672449531:saga-descarte-topic-sns";
+            _topicArn = "arn:aws:sns:sa-east-1:428672449531:descarte-saga-topic-sns";
         }
         /// <summary>
         /// A simple function that takes a string and does a ToUpper
@@ -56,12 +56,14 @@ namespace DescarteLambda
                 BaseMessage baseMsg = JsonConvert.DeserializeObject<BaseMessage>(message.Body);
                 Type tipo = Type.GetType(baseMsg.TypeMsg);
                 dynamic instance = Activator.CreateInstance(tipo, false);
-                await HandleSagaMessage(instance);
+                await HandleSagaMessage(instance, message.Body);
             }
         }
 
-        public async Task HandleSagaMessage(TriagemRealizadaEvent request)
+        public async Task HandleSagaMessage(TriagemRealizadaEvent msg, string body)
         {
+            var request = JsonConvert.DeserializeObject<TriagemRealizadaEvent>(body);
+
             await _emailService.Enviar(request.Email, $"Seu lote {request.Lote} já pode ser retirado. Em caso de Cancelamento", String.Format("https://aobgkj4vt5.execute-api.sa-east-1.amazonaws.com/v1/cancelar?msgid={0}", request.IdMsr));
 
 
@@ -74,8 +76,10 @@ namespace DescarteLambda
             await AWSServices.EnviarMensgemTopico(JsonConvert.SerializeObject(evento), evento.TypeMsg, _topicArn);
         }
 
-        public async Task HandleSagaMessage(LoteDescartadoEvent request)
+        public async Task HandleSagaMessage(LoteDescartadoEvent msg, string body)
         {
+            var request = JsonConvert.DeserializeObject<LoteDescartadoEvent>(body);
+
             //marcar como descartado no banco de dados sql do estoque
             string requestString = JsonConvert.SerializeObject(request);
 
