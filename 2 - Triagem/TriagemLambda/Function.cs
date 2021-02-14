@@ -16,7 +16,7 @@ using Saga.Dependency.DI;
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.SystemTextJson.DefaultLambdaJsonSerializer))]
 
-namespace TriagemLambdadescarte-saga-topic-sns
+namespace TriagemLambda
 {
     public class Function
     {
