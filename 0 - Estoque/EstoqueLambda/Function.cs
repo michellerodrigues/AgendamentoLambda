@@ -63,9 +63,6 @@ namespace EstoqueLambda
             var lotesVencidos = (List<Estoque>)_estoqueRepository.FindItensVencidosEstoque();
             var lotes = new List<LotesVencidosVerificadosEvent>();
 
-            var client = new AmazonSQSClient();
-            string queue = "https://sqs.sa-east-1.amazonaws.com/428672449531/estoque";
-
             if (lotesVencidos != null)
             {
                 foreach (Estoque estoque in lotesVencidos)
@@ -83,7 +80,7 @@ namespace EstoqueLambda
                 }
                 foreach (LotesVencidosVerificadosEvent lote in lotes)
                 {
-                    await client.SendMessageAsync(queue, JsonConvert.SerializeObject(lote)).ConfigureAwait(false);
+                    await AWSServices.EnviarMensgemTopico(JsonConvert.SerializeObject(lote), lote.TypeMsg, _topicArn);
                 }
                 return $"Lotes enviados para a fila : {lotes.Count}";
             }
