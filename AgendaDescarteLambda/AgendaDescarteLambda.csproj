@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
@@ -19,11 +19,11 @@
     <PackageReference Include="Amazon.Lambda.Core" Version="1.2.0" />
     <PackageReference Include="Amazon.Lambda.Serialization.SystemTextJson" Version="2.1.0" />
     <PackageReference Include="Amazon.Lambda.SQSEvents" Version="1.2.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Descarte.Messages\Descarte.Messages.csproj" />
-    <ProjectReference Include="..\..\Agropop.AwsServices.Helper\Agropop.AwsServices.Helper.csproj" />
-    <ProjectReference Include="..\..\Agropop.Dependency.Inject\Agropop.Dependency.Inject.csproj" />
+    <ProjectReference Include="..\6 - Helpers\EmailHelper\Agropop.Email.Helper.csproj" />
+    <ProjectReference Include="..\Agropop.AwsServices.Helper\Agropop.AwsServices.Helper.csproj" />
+    <ProjectReference Include="..\Agropop.Database.Saga\Agropop.Database.Saga.csproj" />
+    <ProjectReference Include="..\Agropop.Dependency.Inject\Agropop.Dependency.Inject.csproj" />
   </ItemGroup>
 </Project>

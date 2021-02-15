@@ -1,3 +1,7 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Agropop.AwsServices.Helper;
 using Agropop.Database.Saga;
 using Agropop.Database.Saga.Tables;
@@ -9,15 +13,11 @@ using Descarte.Messages.Event;
 using EmailHelper;
 using Newtonsoft.Json;
 using Saga.Dependency.DI;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.SystemTextJson.DefaultLambdaJsonSerializer))]
 
-namespace AgendaLambda
+namespace AgendaDescarteLambda
 {
     public class Function
     {
@@ -59,7 +59,7 @@ namespace AgendaLambda
 
 
             var request = JsonConvert.DeserializeObject<LotesVencidosVerificadosEvent>(body);
-            
+
             AgendarRetiradaCommand agendar = new AgendarRetiradaCommand()
             {
                 DataRetirada = DateTime.Now.AddDays(7), //RN
@@ -79,14 +79,14 @@ namespace AgendaLambda
 
             var request = JsonConvert.DeserializeObject<AgendarRetiradaCommand>(body);
 
-            //SagaMessageTable objDynamo = new SagaMessageTable()
-            //{
-            //    IdMsg = request.IdMsr.ToString(),
-            //    Msg = JsonConvert.SerializeObject(request),
-            //    TypeMsg = request.GetType().AssemblyQualifiedName
-            //};
+            SagaMessageTable objDynamo = new SagaMessageTable()
+            {
+                IdMsg = request.IdMsr.ToString(),
+                Msg = JsonConvert.SerializeObject(request),
+                TypeMsg = request.GetType().AssemblyQualifiedName
+            };
 
-           // await _sagaDynamoRepository.IncluirMensagemAgendamento(objDynamo);
+            await _sagaDynamoRepository.IncluirMensagemAgendamento(objDynamo);
 
             await _emailService.Enviar(request.Email, $"Retirada Agendada Lote {request.IdMsr}", String.Format("https://aobgkj4vt5.execute-api.sa-east-1.amazonaws.com/v1/agendar?msgid={0}", request.IdMsr));
 
@@ -111,6 +111,5 @@ namespace AgendaLambda
 
             await AWSServices.EnviarMensgemTopico(JsonConvert.SerializeObject(evento), evento.TypeMsg, _topicArn);
         }
-
     }
 }
