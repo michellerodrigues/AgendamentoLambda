@@ -57,20 +57,21 @@ namespace AgendaDescarteLambda
 
             LambdaLogger.Log("LotesVencidosVerificadosEvent: " + JsonConvert.SerializeObject(body));
 
-
             var request = JsonConvert.DeserializeObject<LotesVencidosVerificadosEvent>(body);
 
             AgendarRetiradaCommand agendar = new AgendarRetiradaCommand()
             {
                 DataRetirada = DateTime.Now.AddDays(7), //RN
                 Email = request.Email,
-                IdMsr = request.IdMsr,
+                IdMsr = request.Lote,
                 Lote = request.Lote,
             };
 
             agendar.TypeMsg = agendar.GetType().AssemblyQualifiedName;
 
             await AWSServices.EnviarMensgemTopico(JsonConvert.SerializeObject(agendar), agendar.TypeMsg, _topicArn);
+            
+            await _sagaDynamoRepository.IncluirMensagemSaga<SagaMessageTable>(agendar.IdMsr.ToString(), JsonConvert.SerializeObject(agendar), agendar.GetType().AssemblyQualifiedName);
         }
 
         public async Task HandleSagaMessage(AgendarRetiradaCommand comando, string body)
@@ -78,22 +79,12 @@ namespace AgendaDescarteLambda
             LambdaLogger.Log("AgendarRetiradaCommand: " + JsonConvert.SerializeObject(body));
 
             var request = JsonConvert.DeserializeObject<AgendarRetiradaCommand>(body);
-
-            SagaMessageTable objDynamo = new SagaMessageTable()
-            {
-                IdMsg = request.IdMsr.ToString(),
-                Msg = JsonConvert.SerializeObject(request),
-                TypeMsg = request.GetType().AssemblyQualifiedName
-            };
-
-            await _sagaDynamoRepository.IncluirMensagemAgendamento(objDynamo);
-
-            await _emailService.Enviar(request.Email, $"Retirada Agendada Lote {request.IdMsr}", String.Format("https://aobgkj4vt5.execute-api.sa-east-1.amazonaws.com/v1/agendar?msgid={0}", request.IdMsr));
+           
+            await _emailService.Enviar(request.Email, $"Favor Confirmar a Retirada Agendada Lote {request.IdMsr}", String.Format("https://aobgkj4vt5.execute-api.sa-east-1.amazonaws.com/v1/agendar?msgid={0}", request.IdMsr));
 
             //publicar event
         }
-
-
+        
 
         public async Task HandleSagaMessage(ConfirmarAgendamentoRetiradaCommand comando, string body)
         {
@@ -110,6 +101,8 @@ namespace AgendaDescarteLambda
             evento.TypeMsg = evento.GetType().AssemblyQualifiedName;
 
             await AWSServices.EnviarMensgemTopico(JsonConvert.SerializeObject(evento), evento.TypeMsg, _topicArn);
+            
+            await _sagaDynamoRepository.IncluirMensagemSaga<SagaMessageTable>(evento.IdMsr.ToString(), JsonConvert.SerializeObject(evento), evento.GetType().AssemblyQualifiedName);
         }
     }
 }

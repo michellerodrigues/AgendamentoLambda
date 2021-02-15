@@ -33,7 +33,21 @@ namespace Agropop.Database.Saga
                         
             return await PutSagaMessage<T>(context, msg);
         }
-        
+
+        public async Task<bool> IncluirMensagemSaga<T>(string idMensagem, string type, string body) where T : SagaMessageTable
+        {
+            DynamoDBContext context = new DynamoDBContext(_client);
+
+            SagaMessageTable msg = new SagaMessageTable()
+            {
+                IdMsg = idMensagem,
+                Msg = body,
+                TypeMsg = type
+            };
+
+            return await PutSagaMessage(context, msg);
+        }
+
         private async Task<SagaMessageTable> GetSagaMessage<T>(DynamoDBContext context, string msgId) where T : SagaMessageTable
         {
             SagaMessageTable sagaItem = await context.LoadAsync<SagaMessageTable>(msgId).ConfigureAwait(false);

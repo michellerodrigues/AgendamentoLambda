@@ -1,6 +1,7 @@
 using Agropop.Database.Models;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Agropop.Database.Interfaces
 {
@@ -10,7 +11,7 @@ namespace Agropop.Database.Interfaces
 
         IEnumerable<Estoque> FindItensFinalizadosEstoque();
 
-        IEnumerable<Estoque> AtualizarLotesEnviadosParaDescarte(Guid estoqueId);
+        Task AtualizarLotesEnviadosParaDescarte(Guid estoqueId);
     }
 
 }

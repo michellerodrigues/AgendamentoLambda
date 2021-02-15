@@ -4,7 +4,7 @@ using System.Linq;
 using Agropop.Database.Models;
 using Agropop.Database.Interfaces;
 using Microsoft.EntityFrameworkCore;
-
+using System.Threading.Tasks;
 
 namespace Agropop.Database.Repository
 {
@@ -34,10 +34,13 @@ namespace Agropop.Database.Repository
                 OrderBy(e => e.Fabricante).ToList();           
         }
 
-        public IEnumerable<Estoque> AtualizarLotesEnviadosParaDescarte(Guid estoqueId)
+        public async Task AtualizarLotesEnviadosParaDescarte(Guid estoqueId)
         {
             DateTime dataVenc = DateTime.Now;
-            return _context.Estoques.Where(e => e.Descartado == false && e.EstoqueId == estoqueId);
+            Estoque lote= _context.Estoques.Where(e => e.Descartado == false && e.EstoqueId == estoqueId).FirstOrDefault();
+            lote.Descartado = true;
+            _context.Estoques.Update(lote);
+            await _context.SaveChangesAsync();
         }
 
     }
