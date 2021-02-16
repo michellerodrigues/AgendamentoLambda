@@ -9,8 +9,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		0 - Estoque\roteiro poc tcc puc minas.txt = 0 - Estoque\roteiro poc tcc puc minas.txt
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Descarte.Messages", "..\Descarte.Messages\Descarte.Messages.csproj", "{7B984F8B-54D0-4495-B90C-BE1478C20548}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "0 - Estoque", "0 - Estoque", "{63A4F055-7630-4482-AD37-0BF41768E637}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EstoqueLambda", "0 - Estoque\EstoqueLambda\EstoqueLambda.csproj", "{5ADDE6ED-0120-4ECB-B581-B28106A6AE4A}"
@@ -67,10 +65,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{7B984F8B-54D0-4495-B90C-BE1478C20548}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7B984F8B-54D0-4495-B90C-BE1478C20548}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7B984F8B-54D0-4495-B90C-BE1478C20548}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7B984F8B-54D0-4495-B90C-BE1478C20548}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5ADDE6ED-0120-4ECB-B581-B28106A6AE4A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5ADDE6ED-0120-4ECB-B581-B28106A6AE4A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5ADDE6ED-0120-4ECB-B581-B28106A6AE4A}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -144,7 +138,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{7B984F8B-54D0-4495-B90C-BE1478C20548} = {38B8ACA9-3C6C-4301-B5AC-5D7D3C4C513D}
 		{5ADDE6ED-0120-4ECB-B581-B28106A6AE4A} = {63A4F055-7630-4482-AD37-0BF41768E637}
 		{7EFC85A4-57AE-4E26-9D13-41DB09AC6B35} = {63A4F055-7630-4482-AD37-0BF41768E637}
 		{33C14B65-5098-4F37-8C88-2BEE2E5F35CE} = {4BA0E91A-AA32-4616-9878-5F8F57C6DBF3}
