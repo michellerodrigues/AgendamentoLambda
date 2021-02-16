@@ -21,6 +21,7 @@
     <PackageReference Include="Amazon.Lambda.SQSEvents" Version="1.2.0" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\4 - Messages\Descarte.Messages.csproj" />
     <ProjectReference Include="..\6 - Helpers\EmailHelper\Agropop.Email.Helper.csproj" />
     <ProjectReference Include="..\Agropop.AwsServices.Helper\Agropop.AwsServices.Helper.csproj" />
     <ProjectReference Include="..\Agropop.Database.Saga\Agropop.Database.Saga.csproj" />

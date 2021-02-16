@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Descarte.Messages\Descarte.Messages.csproj" />
+    <ProjectReference Include="..\4 - Messages\Descarte.Messages.csproj" />
   </ItemGroup>
   
   

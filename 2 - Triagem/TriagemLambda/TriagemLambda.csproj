@@ -22,7 +22,7 @@
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Descarte.Messages\Descarte.Messages.csproj" />
+    <ProjectReference Include="..\..\4 - Messages\Descarte.Messages.csproj" />
     <ProjectReference Include="..\..\Agropop.AwsServices.Helper\Agropop.AwsServices.Helper.csproj" />
     <ProjectReference Include="..\..\Agropop.Dependency.Inject\Agropop.Dependency.Inject.csproj" />
   </ItemGroup>

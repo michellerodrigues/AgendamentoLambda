@@ -2,7 +2,7 @@
 
 namespace Descarte.Messages.Event
 {
-    public class SagaDescarteIniciadoComSucessoCommand : BaseMessage
+    public class SagaFinalizadaComSucessoEvent : BaseMessage
     {
         public string Email { get; set; }
 
