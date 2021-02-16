@@ -59,6 +59,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DescarteLoteLambda", "Desca
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DescarteLoteLambda.Tests", "DescarteLoteLambda.Tests\DescarteLoteLambda.Tests.csproj", "{517195CD-2256-41F0-8BD8-32C991B08C45}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Descarte.Messages", "4 - Messages\Descarte.Messages.csproj", "{A95766EA-68F5-46A9-B2E0-2467FC2E6F3F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -133,6 +135,10 @@ Global
 		{517195CD-2256-41F0-8BD8-32C991B08C45}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{517195CD-2256-41F0-8BD8-32C991B08C45}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{517195CD-2256-41F0-8BD8-32C991B08C45}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A95766EA-68F5-46A9-B2E0-2467FC2E6F3F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A95766EA-68F5-46A9-B2E0-2467FC2E6F3F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A95766EA-68F5-46A9-B2E0-2467FC2E6F3F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A95766EA-68F5-46A9-B2E0-2467FC2E6F3F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -155,6 +161,7 @@ Global
 		{674DEC64-34A1-4BA7-9A93-6A4A2AA3C554} = {C9715B82-1A5C-42ED-AF44-4F6C27B3A1A1}
 		{EF4B42F9-4637-4215-B23E-D865E0629C8D} = {25B9536D-461F-415B-BBB9-B605DEB3D9C1}
 		{517195CD-2256-41F0-8BD8-32C991B08C45} = {25B9536D-461F-415B-BBB9-B605DEB3D9C1}
+		{A95766EA-68F5-46A9-B2E0-2467FC2E6F3F} = {38B8ACA9-3C6C-4301-B5AC-5D7D3C4C513D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C54D2F21-028B-4827-BF22-84033316877A}
