@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Agropop.AwsServices.Helper;
 using Agropop.Database.Saga;
+using Agropop.Database.Saga.Tables;
 using Amazon.Lambda.Core;
 using Amazon.Lambda.SQSEvents;
 using Descarte.Messages;
@@ -53,17 +54,17 @@ namespace TriagemLambda
         {
             var request = JsonConvert.DeserializeObject<AgendamentoRetiradaConfirmadoEvent>(body); 
            
-
             await _emailService.Enviar(request.Email, $"Seu lote {request.Lote} foi enviado para a Triagem. Em caso de Cancelamento", String.Format("https://aobgkj4vt5.execute-api.sa-east-1.amazonaws.com/v1/cancelar?msgid={0}", request.IdMsr));
-
-
+            
             string requestString = JsonConvert.SerializeObject(request);
 
             //publicar event
-            var evento = JsonConvert.DeserializeObject<RealizarTriagemCommand>(requestString);
-            evento.TypeMsg = evento.GetType().AssemblyQualifiedName;
+            var command = JsonConvert.DeserializeObject<RealizarTriagemCommand>(requestString);
+            command.TypeMsg = command.GetType().AssemblyQualifiedName;
 
-            await AWSServices.EnviarMensgemTopico(JsonConvert.SerializeObject(evento), evento.TypeMsg, _topicArn);
+            await _sagaDynamoRepository.IncluirMensagemSaga<SagaMessageTable>(command.IdMsr.ToString(), JsonConvert.SerializeObject(command), command.GetType().AssemblyQualifiedName);
+
+            await AWSServices.EnviarMensgemTopico(JsonConvert.SerializeObject(command), command.TypeMsg, _topicArn);
         }
 
         public async Task HandleSagaMessage(RealizarTriagemCommand msg, string body)
@@ -71,13 +72,14 @@ namespace TriagemLambda
             var request = JsonConvert.DeserializeObject<RealizarTriagemCommand>(body);
 
             await _emailService.Enviar(request.Email, $"Seu lote {request.Lote} está sendo preparado para descarte. Em caso de Cancelamento", String.Format("https://aobgkj4vt5.execute-api.sa-east-1.amazonaws.com/v1/cancelar?msgid={0}", request.IdMsr));
-
-
+            
             string requestString = JsonConvert.SerializeObject(request);
 
             //publicar event
             var evento = JsonConvert.DeserializeObject<TriagemRealizadaEvent>(requestString);
             evento.TypeMsg = evento.GetType().AssemblyQualifiedName;
+
+            await _sagaDynamoRepository.IncluirMensagemSaga<SagaMessageTable>(evento.IdMsr.ToString(), JsonConvert.SerializeObject(evento), evento.GetType().AssemblyQualifiedName);
 
             await AWSServices.EnviarMensgemTopico(JsonConvert.SerializeObject(evento), evento.TypeMsg, _topicArn);
         }

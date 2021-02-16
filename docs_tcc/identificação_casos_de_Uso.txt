@@ -1,0 +1,32 @@
+
+
+
+Indentificação dos casos de uso:
+
+- Fornecedores – fornecem os produtos para a empresa. Eles devem estar cadastrados no sistema.
+
+Cadastrar, Editar, Consultar e Deletar Fornecedores
+Registrar pedido de orçamento
+Registrar pedido de compra
+Enviar pedido de compra
+Enviar nota fiscal de compra para Cliente
+
+
+
+
+- Clientes especiais- eles podem integrar o sistema deles com o da empresa para verificar preços e solicitar orçamentos. 
+
+Cadastrar, Editar, Consultar e Deletar Clientes (diferenciar de especiais e comuns)
+Verificar preço dos produtos
+Solicitar Orçamento de pedido
+Solicitar compra de pedido ao Fornecedor
+
+- Fabricante e/ou revendedor - são responsáveis pelos processos de descarte de embalagens e recolhimento de produtos agrotóxicos vencidos. Eles devem ser avisados da necessidade de descarte com tipos de produtos, volumes e quantidade de embalagens. Eles devem estar cadastrados no sistema.
+
+Cadastrar, Editar, Consultar e Deletar Fabricantes e/ou revendedores
+Notificar embalagens para descarte
+Notificar Produtos Vencidos
+Descartar Embalagens
+Recolher Produto Vencidos
+
+

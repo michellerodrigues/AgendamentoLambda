@@ -1,0 +1,208 @@
+
+saga-dl-queue-sqs
+estoque-queue-sqs
+{
+  "typeMsg": [
+    "Descarte.Messages.Command.VerificarLotesVencidosCommand, Descarte.Messages, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
+    "Descarte.Messages.Command.DescartarLoteEstoqueCommand, Descarte.Messages, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"
+  ]
+}
+
+agenda-queue-sqs
+{
+  "typeMsg": [
+    "Descarte.Messages.Event.LotesVencidosVerificadosEvent, Descarte.Messages, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
+    "Descarte.Messages.Command.AgendarRetiradaCommand, Descarte.Messages, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
+	"Descarte.Messages.Command.ConfirmarAgendamentoRetiradaCommand, Descarte.Messages, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"
+  ]
+}
+
+triagem-queue-sqs
+{
+  "typeMsg": [
+    "Descarte.Messages.Event.AgendamentoRetiradaConfirmadoEvent, Descarte.Messages, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
+    "Descarte.Messages.Command.RealizarTriagemCommand, Descarte.Messages, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"
+  ]
+}
+
+descarte-queue-sqs
+{
+  "typeMsg": [
+    "Descarte.Messages.Event.TriagemRealizadaEvent, Descarte.Messages, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
+    "Descarte.Messages.Event.LoteDescartadoEvent, Descarte.Messages, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"
+  ]
+}
+
+
+política de acesso
+
+delivery sns destination sqs is denied 403
+
+
+{
+  "Statement": [{
+    "Effect":"Allow",
+    "Principal": {
+      "Service": "sns.amazonaws.com"
+    },
+    "Action":"sqs:*",
+    "Resource":"arn:aws:sqs:sa-east-1:428672449531:triagem-queue-sqs",
+    "Condition":{
+      "ArnEquals":{
+        "aws:SourceArn":"arn:aws:sns:sa-east-1:428672449531:descarte-saga-topic-sns"
+      }
+    }
+  }]
+}
+
+
+
+{
+  "Records": [
+    {
+      "messageId": "19dd0b57-b21e-4ac1-bd88-01bbb068cb78",
+      "receiptHandle": "MessageReceiptHandle",
+      "body": "{  \"email\": \"mica.msr@gmail.com\",  \"lote\": \"9bd89eeb-ee99-4f46-b461-93b9b495eeb9\",  \"idMsr\": \"41b02429-ad8b-4493-8656-31f0fbea51a3\",  \"dataRetirada\": \"2021-03-03T12:27:40.150953-03:00\",  \"dateMsg\": \"2021-02-14T08:53:00.150953-03:00\",  \"typeMsg\": \"Descarte.Messages.Event.AgendamentoRetiradaConfirmadoEvent, Descarte.Messages, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null\"}",
+      "attributes": {
+        "ApproximateReceiveCount": "1",
+        "SentTimestamp": "1523232000000",
+        "SenderId": "123456789012",
+        "ApproximateFirstReceiveTimestamp": "1523232000001"
+      },
+      "messageAttributes": {},
+      "md5OfBody": "861148d4ee9f0db68217bfd9dc31ff8a",
+      "eventSource": "aws:sqs",
+      "eventSourceARN": "arn:aws:sqs:sa-east-1:123456789012:MyQueue",
+      "awsRegion": "sa-east-1"
+    }
+  ]
+}
+
+{
+  "Records": [
+    {
+      "messageId": "19dd0b57-b21e-4ac1-bd88-01bbb068cb78",
+      "receiptHandle": "MessageReceiptHandle",
+      "body": "{  \"email\": \"mica.msr@gmail.com\",  \"lote\": \"9bd89eeb-ee88-4f46-b461-93b9b495eeb9\",  \"idMsr\": \"41b02429-ad8b-4493-8656-31f0fbea51a3\",  \"dataRetirada\": \"2021-03-03T12:27:40.150953-03:00\",  \"dateMsg\": \"2021-02-14T08:53:00.150953-03:00\",  \"typeMsg\": \"Descarte.Messages.Event.LotesVencidosVerificadosEvent, Descarte.Messages, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null\"}",
+      "attributes": {
+        "ApproximateReceiveCount": "1",
+        "SentTimestamp": "1523232000000",
+        "SenderId": "123456789012",
+        "ApproximateFirstReceiveTimestamp": "1523232000001"
+      },
+      "messageAttributes":{
+			"typeMsg":{
+				"DataType": "string",
+				"StringValue": "Descarte.Messages.Event.LotesVencidosVerificadosEvent, Descarte.Messages, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"
+			}
+	   },
+      "md5OfBody": "861148d4ee9f0db68217bfd9dc31ff8a",
+      "eventSource": "aws:sqs",
+      "eventSourceARN": "arn:aws:sqs:sa-east-1:123456789012:MyQueue",
+      "awsRegion": "sa-east-1"
+    }
+  ]
+}
+
+
+{
+  "Records": [
+    {
+      "messageId": "19dd0b57-b21e-4ac1-bd88-01bbb068cb78",
+      "receiptHandle": "MessageReceiptHandle",
+      "body": "{  \"email\": \"mica.msr@gmail.com\",  \"lote\": \"9bd89eeb-ee88-4f46-b461-93b9b495eeb9\",  \"idMsr\": \"41b02429-ad8b-4493-8656-31f0fbea51a3\",  \"dataRetirada\": \"2021-03-03T12:27:40.150953-03:00\",  \"dateMsg\": \"2021-02-14T08:53:00.150953-03:00\",  \"typeMsg\": \"Descarte.Messages.Command.DescartarLoteEstoqueCommand, Descarte.Messages, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null\"}",
+      "attributes": {
+        "ApproximateReceiveCount": "1",
+        "SentTimestamp": "1523232000000",
+        "SenderId": "123456789012",
+        "ApproximateFirstReceiveTimestamp": "1523232000001"
+      },
+      "messageAttributes": {
+        "typeMsg": {
+          "DataType": "string",
+          "StringValue": "Descarte.Messages.Command.DescartarLoteEstoqueCommand, Descarte.Messages, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"
+        }
+      },
+      "md5OfBody": "861148d4ee9f0db68217bfd9dc31ff8a",
+      "eventSource": "aws:sqs",
+      "eventSourceARN": "arn:aws:sqs:sa-east-1:123456789012:MyQueue",
+      "awsRegion": "sa-east-1"
+    }
+  ]
+}
+
+
+{
+  "Records": [
+    {
+      "messageId": "19dd0b57-b21e-4ac1-bd88-01bbb068cb78",
+      "receiptHandle": "MessageReceiptHandle",
+      "body": "{  \"email\": \"mica.msr@gmail.com\",  \"lote\": \"9bd89eeb-ee88-4f46-b461-93b9b495eeb9\",  \"idMsr\": \"41b02429-ad8b-4493-8656-31f0fbea51a3\",  \"dataRetirada\": \"2021-03-03T12:27:40.150953-03:00\",  \"dateMsg\": \"2021-02-14T08:53:00.150953-03:00\",  \"typeMsg\": \"Descarte.Messages.Event.TriagemRealizadaEvent, Descarte.Messages, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null\"}",
+      "attributes": {
+        "ApproximateReceiveCount": "1",
+        "SentTimestamp": "1523232000000",
+        "SenderId": "123456789012",
+        "ApproximateFirstReceiveTimestamp": "1523232000001"
+      },
+      "messageAttributes": {
+        "typeMsg": {
+          "DataType": "string",
+          "StringValue": "Descarte.Messages.Event.TriagemRealizadaEvent, Descarte.Messages, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"
+        }
+      },
+      "md5OfBody": "861148d4ee9f0db68217bfd9dc31ff8a",
+      "eventSource": "aws:sqs",
+      "eventSourceARN": "arn:aws:sqs:sa-east-1:123456789012:MyQueue",
+      "awsRegion": "sa-east-1"
+    }
+  ]
+}
+
+{
+  "Records": [
+    {
+      "messageId": "19dd0b57-b21e-4ac1-bd88-01bbb068cb78",
+      "receiptHandle": "MessageReceiptHandle",
+      "body": "{  \"email\": \"mica.msr@gmail.com\",  \"lote\": \"9bd89eeb-ee88-4f46-b461-93b9b495eeb9\",  \"idMsr\": \"41b02429-ad8b-4493-8656-31f0fbea51a3\",  \"dataRetirada\": \"2021-03-03T12:27:40.150953-03:00\",  \"dateMsg\": \"2021-02-14T08:53:00.150953-03:00\",  \"typeMsg\": \"Descarte.Messages.Command.DescartarLoteEstoqueCommand, Descarte.Messages, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null\"}",
+      "attributes": {
+        "ApproximateReceiveCount": "1",
+        "SentTimestamp": "1523232000000",
+        "SenderId": "123456789012",
+        "ApproximateFirstReceiveTimestamp": "1523232000001"
+      },
+      "messageAttributes": {
+        "typeMsg": {
+          "DataType": "string",
+          "StringValue": "Descarte.Messages.Command.DescartarLoteEstoqueCommand, Descarte.Messages, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"
+        }
+      },
+      "md5OfBody": "861148d4ee9f0db68217bfd9dc31ff8a",
+      "eventSource": "aws:sqs",
+      "eventSourceARN": "arn:aws:sqs:sa-east-1:123456789012:MyQueue",
+      "awsRegion": "sa-east-1"
+    }
+  ]
+}
+
+{  email: mica.msr@gmail.com,  lote: e5054677-ec20-4290-aa25-51d001210099,  idMsr: e5054677-ec20-4290-aa25-51d001210099,  dataRetirada: 2021-03-03T12:27:40.150953-03:00,  dateMsg: 2021-02-14T08:53:00.150953-03:00,  typeMsg: Descarte.Messages.Event.LotesVencidosVerificadosEvent, Descarte.Messages, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null}
+
+
+{
+  "Version": "2008-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "sns.amazonaws.com"
+      },
+      "Action": "sqs:*",
+      "Resource": "arn:aws:sqs:sa-east-1:428672449531:agenda-queue-sqs",
+      "Condition": {
+        "ArnEquals": {
+          "aws:SourceArn": "arn:aws:sns:sa-east-1:428672449531:descarte-saga-topic-sns"
+        }
+      }
+    }
+  ]
+}
+

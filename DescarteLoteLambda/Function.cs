@@ -1,6 +1,7 @@
 using Agropop.AwsServices.Helper;
 using Agropop.Database.Interfaces;
 using Agropop.Database.Saga;
+using Agropop.Database.Saga.Tables;
 using Amazon.Lambda.Core;
 using Amazon.Lambda.SQSEvents;
 using Descarte.Messages;
@@ -54,13 +55,14 @@ namespace DescarteLoteLambda
             var request = JsonConvert.DeserializeObject<TriagemRealizadaEvent>(body);
 
             await _emailService.Enviar(request.Email, $"Seu lote {request.Lote} já pode ser retirado. Em caso de Cancelamento", String.Format("https://aobgkj4vt5.execute-api.sa-east-1.amazonaws.com/v1/cancelar?msgid={0}", request.IdMsr));
-
-
+            
             string requestString = JsonConvert.SerializeObject(request);
 
             //publicar event
             var evento = JsonConvert.DeserializeObject<DescartarLoteEstoqueCommand>(requestString);
             evento.TypeMsg = evento.GetType().AssemblyQualifiedName;
+
+            await _sagaDynamoRepository.IncluirMensagemSaga<SagaMessageTable>(evento.IdMsr.ToString(), JsonConvert.SerializeObject(evento), evento.GetType().AssemblyQualifiedName);
 
             await AWSServices.EnviarMensgemTopico(JsonConvert.SerializeObject(evento), evento.TypeMsg, _topicArn);
         }
@@ -69,12 +71,15 @@ namespace DescarteLoteLambda
         {
             var request = JsonConvert.DeserializeObject<LoteDescartadoEvent>(body);
 
-            //marcar como descartado no banco de dados sql do estoque
-            string requestString = JsonConvert.SerializeObject(request);
+            await _sagaDynamoRepository.IncluirMensagemSaga<SagaMessageTable>(request.IdMsr.ToString(), JsonConvert.SerializeObject(request), request.GetType().AssemblyQualifiedName);
+
+            await _estoqueRepository.AtualizarLotesEnviadosParaDescarte(request.Lote);
 
             await _emailService.Enviar(request.Email, $"Seu lote {request.Lote} foi entregue com sucesso. Obrigada por contribuir para a natureza", String.Format("https://aobgkj4vt5.execute-api.sa-east-1.amazonaws.com/v1/cancelar?msgid={0}", request.IdMsr));
 
-            //salvar no dynamo que está finalizado
+            SagaIniciadaComSucessoEvent sagaEnd = JsonConvert.DeserializeObject<SagaIniciadaComSucessoEvent>(JsonConvert.SerializeObject(request));
+            
+            await _sagaDynamoRepository.IncluirMensagemSaga<SagaMessageTable>(sagaEnd.IdMsr.ToString(), JsonConvert.SerializeObject(sagaEnd), sagaEnd.GetType().AssemblyQualifiedName);
         }
     }
 }

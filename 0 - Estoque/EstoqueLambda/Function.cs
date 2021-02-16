@@ -2,6 +2,8 @@ using Agropop.AwsServices.Helper;
 using Agropop.Database.DataContext;
 using Agropop.Database.Interfaces;
 using Agropop.Database.Models;
+using Agropop.Database.Saga;
+using Agropop.Database.Saga.Tables;
 using Amazon.Lambda.Core;
 using Amazon.Lambda.SQSEvents;
 using Amazon.SQS;
@@ -24,7 +26,7 @@ namespace EstoqueLambda
     {
         public AppSettings AppSettings { get; }
         private readonly IEstoqueRepository _estoqueRepository;
-
+        private readonly ISagaDynamoRepository _sagaDynamoRepository;
         private readonly IEmailService _emailService;
 
         private readonly InitializeDbContext _initialize;
@@ -35,6 +37,7 @@ namespace EstoqueLambda
         {
             var resolver = new DependencyResolver();
             _estoqueRepository = resolver.GetService<IEstoqueRepository>();
+            _sagaDynamoRepository = resolver.GetService<ISagaDynamoRepository>();
             _emailService = resolver.GetService<IEmailService>();
             var context = resolver.GetService<DescarteDataContext>();
             _initialize = new InitializeDbContext(context);
@@ -71,7 +74,7 @@ namespace EstoqueLambda
                     {
                         DateMsg = System.DateTime.Now,
                         Email = estoque.Fabricante.Email,
-                        IdMsr = Guid.NewGuid(),
+                        IdMsr = estoque.EstoqueId,
                         Lote = estoque.EstoqueId
                     };
                     lote.TypeMsg = lote.GetType().AssemblyQualifiedName;
@@ -80,7 +83,8 @@ namespace EstoqueLambda
                 }
                 foreach (LotesVencidosVerificadosEvent lote in lotes)
                 {
-                    await AWSServices.EnviarMensgemTopico(JsonConvert.SerializeObject(lote), lote.TypeMsg, _topicArn);
+                    await _sagaDynamoRepository.IncluirMensagemSaga<SagaMessageTable>(lote.IdMsr.ToString(), JsonConvert.SerializeObject(lote), lote.GetType().AssemblyQualifiedName);
+                    await AWSServices.EnviarMensgemTopico(JsonConvert.SerializeObject(lote), lote.TypeMsg, _topicArn);                    
                 }
                 return $"Lotes enviados para a fila : {lotes.Count}";
             }
@@ -91,14 +95,14 @@ namespace EstoqueLambda
         {
             var request = JsonConvert.DeserializeObject<DescartarLoteEstoqueCommand>(body);
 
-            //marcar no banco que o estoque foi descartado
             await _emailService.Enviar(request.Email, $"Seu lote {request.Lote} foi descartado com sucesso", String.Format("https://aobgkj4vt5.execute-api.sa-east-1.amazonaws.com/v1/cancelar?msgid={0}", request.IdMsr));
 
             string requestString = JsonConvert.SerializeObject(request);
 
-            //publicar event
             var evento = JsonConvert.DeserializeObject<LoteDescartadoEvent>(requestString);
             evento.TypeMsg = evento.GetType().AssemblyQualifiedName;
+
+            await _sagaDynamoRepository.IncluirMensagemSaga<SagaMessageTable>(evento.IdMsr.ToString(), JsonConvert.SerializeObject(evento), evento.GetType().AssemblyQualifiedName);
 
             await AWSServices.EnviarMensgemTopico(JsonConvert.SerializeObject(evento), evento.TypeMsg, _topicArn);
         }

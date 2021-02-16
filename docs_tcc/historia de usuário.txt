@@ -1,0 +1,25 @@
+
+
+A cada 7 dias, o serviço de desccarte verifica itens vencidos no estoque
+Se houver itens vencidos ou finalizados, o serviço de descarte envia um e-mail para o fornecedor/revendedor dono do material a ser descartado
+ao receber o e-mail, o dono do descarte dispõe de 3 datas para prosegguir com o agendamento;
+Ao clicar neste link, o serviço de agendamento é acionado, produzindo a mensagem AgendamentoRetiradaCommand
+
+Este AgendamentoRetiradaCommand envia um e-mail para o solicitante, pedindo que o mesmo confirme o agendamento através de um link
+
+Ao clicar neste link, o serviço de Agendamento gera o ConfirmarAgendamentoCommand
+
+O agendamento é confirmado e um AgendamentoConfirmadoEvent é disparado para o tópico de descarte
+
+O serviço de Triagem trata o evento e gera um comando para Realizar triagem, informando pra qual data o agendamento está confirmado
+
+PS: as triagens não realizadas até o prazo do agendamento serão canceladas imediatamente (diariamente um serviço verifica)
+
+Ao perceber uma triagem inválida, o comando CancelarTriagemCommand
+Ao cancelar a triagem, um evento é disparado TriagemCanceladaEvent
+O serviço de agendamento trata este evento, disparando para o dono do processo que o agendamento foi cancelado e que em breve o fornecedor receberá nova data de agendamento
+
+Diariamente um serviço verifica os agendamentos não confirmados até a data limite: caso tenha agendamento não confirmado em até d-3 da data limite, o serviço enviará um e-mail informando que o agendamento foi cancelado por inatividade
+Ao cancelar um agendamento não confirmado, um evento é disparadao AgendamentoRetiradaCanceladoEvent
+
+
