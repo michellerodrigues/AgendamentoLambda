@@ -1,4 +1,5 @@
 using Agropop.AwsServices.Helper;
+using Agropop.AwsServices.Helper.SNS;
 using Agropop.Database.DataContext;
 using Agropop.Database.Interfaces;
 using Agropop.Database.Models;
@@ -84,7 +85,7 @@ namespace EstoqueLambda
                 foreach (LotesVencidosVerificadosEvent lote in lotes)
                 {
                     await _sagaDynamoRepository.IncluirMensagemSaga<SagaMessageTable>(lote.IdMsr.ToString(), JsonConvert.SerializeObject(lote), lote.GetType().AssemblyQualifiedName);
-                    await AWSServices.EnviarMensgemTopico(JsonConvert.SerializeObject(lote), lote.TypeMsg, _topicArn);                    
+                    await SNSServices.EnviarMensgemTopico(JsonConvert.SerializeObject(lote), lote.TypeMsg, _topicArn);                    
                 }
                 return $"Lotes enviados para a fila : {lotes.Count}";
             }
@@ -104,7 +105,7 @@ namespace EstoqueLambda
 
             await _sagaDynamoRepository.IncluirMensagemSaga<SagaMessageTable>(evento.IdMsr.ToString(), JsonConvert.SerializeObject(evento), evento.GetType().AssemblyQualifiedName);
 
-            await AWSServices.EnviarMensgemTopico(JsonConvert.SerializeObject(evento), evento.TypeMsg, _topicArn);
+            await SNSServices.EnviarMensgemTopico(JsonConvert.SerializeObject(evento), evento.TypeMsg, _topicArn);
         }
     }
 }

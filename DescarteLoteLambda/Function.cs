@@ -64,7 +64,7 @@ namespace DescarteLoteLambda
 
             await _sagaDynamoRepository.IncluirMensagemSaga<SagaMessageTable>(evento.IdMsr.ToString(), JsonConvert.SerializeObject(evento), evento.GetType().AssemblyQualifiedName);
 
-            await AWSServices.EnviarMensgemTopico(JsonConvert.SerializeObject(evento), evento.TypeMsg, _topicArn);
+            await SNSServices.EnviarMensgemTopico(JsonConvert.SerializeObject(evento), evento.TypeMsg, _topicArn);
         }
 
         public async Task HandleSagaMessage(LoteDescartadoEvent msg, string body)
@@ -77,7 +77,7 @@ namespace DescarteLoteLambda
 
             await _emailService.Enviar(request.Email, $"Seu lote {request.Lote} foi entregue com sucesso. Obrigada por contribuir para a natureza", String.Format("https://aobgkj4vt5.execute-api.sa-east-1.amazonaws.com/v1/cancelar?msgid={0}", request.IdMsr));
 
-            SagaIniciadaComSucessoEvent sagaEnd = JsonConvert.DeserializeObject<SagaIniciadaComSucessoEvent>(JsonConvert.SerializeObject(request));
+            SagaFinalizadaComSucessoEvent sagaEnd = JsonConvert.DeserializeObject<SagaFinalizadaComSucessoEvent>(JsonConvert.SerializeObject(request));
             
             await _sagaDynamoRepository.IncluirMensagemSaga<SagaMessageTable>(sagaEnd.IdMsr.ToString(), JsonConvert.SerializeObject(sagaEnd), sagaEnd.GetType().AssemblyQualifiedName);
         }

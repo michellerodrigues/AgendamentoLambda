@@ -1,4 +1,5 @@
 using Agropop.AwsServices.Helper;
+using Agropop.AwsServices.Helper.SNS;
 using Amazon.Lambda.Core;
 using Descarte.Messages.Command;
 using Newtonsoft.Json;
@@ -38,7 +39,7 @@ namespace SagaLambda
             VerificarLotesVencidosCommand message = new VerificarLotesVencidosCommand();
             message.TypeMsg = message.GetType().AssemblyQualifiedName;
 
-            await AWSServices.EnviarMensgemTopico(JsonConvert.SerializeObject(message), message.GetType().AssemblyQualifiedName, _topicArn);
+            await SNSServices.EnviarMensgemTopico(JsonConvert.SerializeObject(message), message.GetType().AssemblyQualifiedName, _topicArn);
                      
 
             return $"mensagem publicada { JsonConvert.SerializeObject(message)}";

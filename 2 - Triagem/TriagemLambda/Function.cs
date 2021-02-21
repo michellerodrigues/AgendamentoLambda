@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Agropop.AwsServices.Helper;
+using Agropop.AwsServices.Helper.SNS;
 using Agropop.Database.Saga;
 using Agropop.Database.Saga.Tables;
 using Amazon.Lambda.Core;
@@ -64,7 +65,7 @@ namespace TriagemLambda
 
             await _sagaDynamoRepository.IncluirMensagemSaga<SagaMessageTable>(command.IdMsr.ToString(), JsonConvert.SerializeObject(command), command.GetType().AssemblyQualifiedName);
 
-            await AWSServices.EnviarMensgemTopico(JsonConvert.SerializeObject(command), command.TypeMsg, _topicArn);
+            await SNSServices.EnviarMensgemTopico(JsonConvert.SerializeObject(command), command.TypeMsg, _topicArn);
         }
 
         public async Task HandleSagaMessage(RealizarTriagemCommand msg, string body)
@@ -81,7 +82,7 @@ namespace TriagemLambda
 
             await _sagaDynamoRepository.IncluirMensagemSaga<SagaMessageTable>(evento.IdMsr.ToString(), JsonConvert.SerializeObject(evento), evento.GetType().AssemblyQualifiedName);
 
-            await AWSServices.EnviarMensgemTopico(JsonConvert.SerializeObject(evento), evento.TypeMsg, _topicArn);
+            await SNSServices.EnviarMensgemTopico(JsonConvert.SerializeObject(evento), evento.TypeMsg, _topicArn);
         }
         
     }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Agropop.AwsServices.Helper;
+using Agropop.AwsServices.Helper.SNS;
 using Agropop.Database.Saga;
 using Agropop.Database.Saga.Tables;
 using Amazon.Lambda.Core;
@@ -71,7 +72,7 @@ namespace AgendaDescarteLambda
            
             agendar.TypeMsg = agendar.GetType().AssemblyQualifiedName;
             await _sagaDynamoRepository.IncluirMensagemSaga<SagaMessageTable>(agendar.IdMsr.ToString(), JsonConvert.SerializeObject(agendar), agendar.GetType().AssemblyQualifiedName);            
-            await AWSServices.EnviarMensgemTopico(JsonConvert.SerializeObject(agendar), agendar.TypeMsg, _topicArn);
+            await SNSServices.EnviarMensgemTopico(JsonConvert.SerializeObject(agendar), agendar.TypeMsg, _topicArn);
             await _sagaDynamoRepository.IncluirMensagemSaga<SagaMessageTable>(sagastart.IdMsr.ToString(), JsonConvert.SerializeObject(sagastart), sagastart.GetType().AssemblyQualifiedName);
         }
 
@@ -102,7 +103,7 @@ namespace AgendaDescarteLambda
             evento.TypeMsg = evento.GetType().AssemblyQualifiedName;
 
             await _sagaDynamoRepository.IncluirMensagemSaga<SagaMessageTable>(evento.IdMsr.ToString(), JsonConvert.SerializeObject(evento), evento.GetType().AssemblyQualifiedName);
-            await AWSServices.EnviarMensgemTopico(JsonConvert.SerializeObject(evento), evento.TypeMsg, _topicArn);
+            await SNSServices.EnviarMensgemTopico(JsonConvert.SerializeObject(evento), evento.TypeMsg, _topicArn);
         }
     }
 }

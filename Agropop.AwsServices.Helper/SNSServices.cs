@@ -4,9 +4,9 @@ using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Agropop.AwsServices.Helper
+namespace Agropop.AwsServices.Helper.SNS
 {
-    public class AWSServices
+    public class SNSServices
     {
         public static async Task EnviarMensgemTopico(string message, string assemblyQualifiedName, string topicArn)
         {

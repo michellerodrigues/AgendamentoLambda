@@ -87,7 +87,7 @@ namespace SagaApiLambda
 
                 confirmar.TypeMsg = confirmar.GetType().AssemblyQualifiedName;
 
-                await AWSServices.EnviarMensgemTopico(JsonConvert.SerializeObject(confirmar), message.GetType().AssemblyQualifiedName, _topicArn);
+                await SNSServices.EnviarMensgemTopico(JsonConvert.SerializeObject(confirmar), message.GetType().AssemblyQualifiedName, _topicArn);
              }
         }
     }
