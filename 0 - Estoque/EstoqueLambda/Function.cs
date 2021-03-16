@@ -1,4 +1,3 @@
-using Agropop.AwsServices.Helper;
 using Agropop.AwsServices.Helper.SNS;
 using Agropop.Database.DataContext;
 using Agropop.Database.Interfaces;
@@ -7,7 +6,6 @@ using Agropop.Database.Saga;
 using Agropop.Database.Saga.Tables;
 using Amazon.Lambda.Core;
 using Amazon.Lambda.SQSEvents;
-using Amazon.SQS;
 using Descarte.Messages;
 using Descarte.Messages.Command;
 using Descarte.Messages.Event;
@@ -103,7 +101,7 @@ namespace EstoqueLambda
             var evento = JsonConvert.DeserializeObject<LoteDescartadoEvent>(requestString);
             evento.TypeMsg = evento.GetType().AssemblyQualifiedName;
 
-            await _sagaDynamoRepository.IncluirMensagemSaga<SagaMessageTable>(evento.IdMsr.ToString(), JsonConvert.SerializeObject(evento), evento.GetType().AssemblyQualifiedName);
+            await _sagaDynamoRepository.IncluirMensagemSaga<SagaMessageTable>(evento.IdMsr.ToString(), evento.GetType().AssemblyQualifiedName, JsonConvert.SerializeObject(evento));
 
             await SNSServices.EnviarMensgemTopico(JsonConvert.SerializeObject(evento), evento.TypeMsg, _topicArn);
         }

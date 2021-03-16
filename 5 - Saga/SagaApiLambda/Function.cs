@@ -1,22 +1,15 @@
-using Agropop.AwsServices.Helper;
 using Agropop.Database.Saga;
 using Agropop.Database.Saga.Tables;
-using Amazon.Lambda.APIGatewayEvents;
 using Amazon.Lambda.Core;
-using Amazon.SimpleNotificationService;
-using Amazon.SimpleNotificationService.Model;
-using Descarte.Messages;
 using Descarte.Messages.Command;
-using Descarte.Messages.Event;
 using EmailHelper;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Saga.Dependency.DI;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using Agropop.AwsServices.Helper.SNS;
 
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.

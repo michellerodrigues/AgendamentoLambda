@@ -1,5 +1,6 @@
 using Agropop.AwsServices.Helper;
 using Agropop.Database.Interfaces;
+using Agropop.AwsServices.Helper.SNS;
 using Agropop.Database.Saga;
 using Agropop.Database.Saga.Tables;
 using Amazon.Lambda.Core;
