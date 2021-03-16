@@ -63,7 +63,7 @@ namespace TriagemLambda
             var command = JsonConvert.DeserializeObject<RealizarTriagemCommand>(requestString);
             command.TypeMsg = command.GetType().AssemblyQualifiedName;
 
-            await _sagaDynamoRepository.IncluirMensagemSaga<SagaMessageTable>(command.IdMsr.ToString(), JsonConvert.SerializeObject(command), command.GetType().AssemblyQualifiedName);
+            await _sagaDynamoRepository.IncluirMensagemSaga<SagaMessageTable>(command.IdMsr.ToString(),  command.GetType().AssemblyQualifiedName, JsonConvert.SerializeObject(command));
 
             await SNSServices.EnviarMensgemTopico(JsonConvert.SerializeObject(command), command.TypeMsg, _topicArn);
         }
@@ -80,7 +80,7 @@ namespace TriagemLambda
             var evento = JsonConvert.DeserializeObject<TriagemRealizadaEvent>(requestString);
             evento.TypeMsg = evento.GetType().AssemblyQualifiedName;
 
-            await _sagaDynamoRepository.IncluirMensagemSaga<SagaMessageTable>(evento.IdMsr.ToString(), JsonConvert.SerializeObject(evento), evento.GetType().AssemblyQualifiedName);
+            await _sagaDynamoRepository.IncluirMensagemSaga<SagaMessageTable>(evento.IdMsr.ToString(), evento.GetType().AssemblyQualifiedName, JsonConvert.SerializeObject(evento));
 
             await SNSServices.EnviarMensgemTopico(JsonConvert.SerializeObject(evento), evento.TypeMsg, _topicArn);
         }

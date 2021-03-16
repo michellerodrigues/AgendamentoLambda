@@ -82,7 +82,7 @@ namespace EstoqueLambda
                 }
                 foreach (LotesVencidosVerificadosEvent lote in lotes)
                 {
-                    await _sagaDynamoRepository.IncluirMensagemSaga<SagaMessageTable>(lote.IdMsr.ToString(), JsonConvert.SerializeObject(lote), lote.GetType().AssemblyQualifiedName);
+                    await _sagaDynamoRepository.IncluirMensagemSaga<SagaMessageTable>(lote.IdMsr.ToString(),  lote.GetType().AssemblyQualifiedName, JsonConvert.SerializeObject(lote));
                     await SNSServices.EnviarMensgemTopico(JsonConvert.SerializeObject(lote), lote.TypeMsg, _topicArn);                    
                 }
                 return $"Lotes enviados para a fila : {lotes.Count}";

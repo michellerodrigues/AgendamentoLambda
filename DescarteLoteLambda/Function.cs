@@ -63,7 +63,7 @@ namespace DescarteLoteLambda
             var evento = JsonConvert.DeserializeObject<DescartarLoteEstoqueCommand>(requestString);
             evento.TypeMsg = evento.GetType().AssemblyQualifiedName;
 
-            await _sagaDynamoRepository.IncluirMensagemSaga<SagaMessageTable>(evento.IdMsr.ToString(), JsonConvert.SerializeObject(evento), evento.GetType().AssemblyQualifiedName);
+            await _sagaDynamoRepository.IncluirMensagemSaga<SagaMessageTable>(evento.IdMsr.ToString(), evento.GetType().AssemblyQualifiedName, JsonConvert.SerializeObject(evento));
 
             await SNSServices.EnviarMensgemTopico(JsonConvert.SerializeObject(evento), evento.TypeMsg, _topicArn);
         }
@@ -72,7 +72,7 @@ namespace DescarteLoteLambda
         {
             var request = JsonConvert.DeserializeObject<LoteDescartadoEvent>(body);
 
-            await _sagaDynamoRepository.IncluirMensagemSaga<SagaMessageTable>(request.IdMsr.ToString(), JsonConvert.SerializeObject(request), request.GetType().AssemblyQualifiedName);
+            await _sagaDynamoRepository.IncluirMensagemSaga<SagaMessageTable>(request.IdMsr.ToString(), request.GetType().AssemblyQualifiedName, JsonConvert.SerializeObject(request));
 
             await _estoqueRepository.AtualizarLotesEnviadosParaDescarte(request.Lote);
 
@@ -80,7 +80,7 @@ namespace DescarteLoteLambda
 
             SagaFinalizadaComSucessoEvent sagaEnd = JsonConvert.DeserializeObject<SagaFinalizadaComSucessoEvent>(JsonConvert.SerializeObject(request));
             
-            await _sagaDynamoRepository.IncluirMensagemSaga<SagaMessageTable>(sagaEnd.IdMsr.ToString(), JsonConvert.SerializeObject(sagaEnd), sagaEnd.GetType().AssemblyQualifiedName);
+            await _sagaDynamoRepository.IncluirMensagemSaga<SagaMessageTable>(sagaEnd.IdMsr.ToString(), sagaEnd.GetType().AssemblyQualifiedName, JsonConvert.SerializeObject(sagaEnd));
         }
     }
 }

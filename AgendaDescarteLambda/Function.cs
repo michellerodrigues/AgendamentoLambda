@@ -71,9 +71,9 @@ namespace AgendaDescarteLambda
             SagaIniciadaComSucessoEvent sagastart = JsonConvert.DeserializeObject<SagaIniciadaComSucessoEvent>(JsonConvert.SerializeObject(agendar));
            
             agendar.TypeMsg = agendar.GetType().AssemblyQualifiedName;
-            await _sagaDynamoRepository.IncluirMensagemSaga<SagaMessageTable>(agendar.IdMsr.ToString(), JsonConvert.SerializeObject(agendar), agendar.GetType().AssemblyQualifiedName);            
+            await _sagaDynamoRepository.IncluirMensagemSaga<SagaMessageTable>(agendar.IdMsr.ToString(), agendar.GetType().AssemblyQualifiedName, JsonConvert.SerializeObject(agendar));            
             await SNSServices.EnviarMensgemTopico(JsonConvert.SerializeObject(agendar), agendar.TypeMsg, _topicArn);
-            await _sagaDynamoRepository.IncluirMensagemSaga<SagaMessageTable>(sagastart.IdMsr.ToString(), JsonConvert.SerializeObject(sagastart), sagastart.GetType().AssemblyQualifiedName);
+            await _sagaDynamoRepository.IncluirMensagemSaga<SagaMessageTable>(sagastart.IdMsr.ToString(), sagastart.GetType().AssemblyQualifiedName, JsonConvert.SerializeObject(sagastart));
         }
 
         public async Task HandleSagaMessage(AgendarRetiradaCommand comando, string body)
@@ -102,7 +102,7 @@ namespace AgendaDescarteLambda
             var evento = JsonConvert.DeserializeObject<AgendamentoRetiradaConfirmadoEvent>(requestString);
             evento.TypeMsg = evento.GetType().AssemblyQualifiedName;
 
-            await _sagaDynamoRepository.IncluirMensagemSaga<SagaMessageTable>(evento.IdMsr.ToString(), JsonConvert.SerializeObject(evento), evento.GetType().AssemblyQualifiedName);
+            await _sagaDynamoRepository.IncluirMensagemSaga<SagaMessageTable>(evento.IdMsr.ToString(),  evento.GetType().AssemblyQualifiedName, JsonConvert.SerializeObject(evento));
             await SNSServices.EnviarMensgemTopico(JsonConvert.SerializeObject(evento), evento.TypeMsg, _topicArn);
         }
     }
